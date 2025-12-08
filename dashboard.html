@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Grovity – Dashboard</title>
+  <link rel="stylesheet" href="./dist/output.css" />
+  <link rel="stylesheet" href="./theme-system.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+
+<body class="bg-slate-950 text-slate-100">
+
+  <!-- NAVBAR -->
+  <nav class="bg-slate-950/80 backdrop-blur border-b border-slate-800 px-3 sm:px-6 md:px-8 py-3">
+    <div class="flex items-center justify-between max-w-7xl mx-auto w-full relative">
+      <a href="index.html" class="text-xl sm:text-2xl font-bold tracking-tight text-blue-400">Grovity</a>
+
+      <ul class="hidden md:flex gap-10 text-sm font-medium text-slate-200 absolute left-1/2 -translate-x-1/2">
+        <li><a href="index.html#product" class="hover:text-blue-400">Home</a></li>
+        <li><a href="index.html#pricing" class="hover:text-blue-400">Pricing</a></li>
+        <li><a href="workspace.html" class="hover:text-blue-400">Workspace</a></li>
+        <li><a href="dashboard.html" class="text-blue-400 font-semibold">Dashboard</a></li>
+      </ul>
+
+      <div class="hidden md:flex items-center gap-4 text-sm">
+        <select class="border border-slate-700 bg-slate-900 text-slate-200 rounded px-2 py-1 text-xs">
+          <option>EN</option>
+          <option>HI</option>
+        </select>
+        <button onclick="handleLogout()" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 font-medium">Logout</button>
+      </div>
+
+      <button id="menuBtn" class="md:hidden p-2 border border-slate-700 rounded text-slate-200">☰</button>
+    </div>
+  </nav>
+
+  <div id="overlay" class="hidden fixed inset-0 bg-black/60 z-30"></div>
+
+  <!-- SIDEBAR -->
+  <aside id="sidebar"
+    class="fixed top-0 right-0 h-full w-64 bg-slate-900 shadow-lg z-40 transform translate-x-full transition-transform duration-300 flex flex-col gap-6 p-6 text-slate-100 md:hidden">
+    <button id="closeBtn" class="self-end text-2xl font-bold leading-none">×</button>
+    <a href="index.html" class="hover:text-blue-400 text-sm font-medium">Home</a>
+    <a href="index.html#pricing" class="hover:text-blue-400 text-sm font-medium">Pricing</a>
+    <a href="workspace.html" class="hover:text-blue-400 text-sm font-medium">Workspace</a>
+    <a href="dashboard.html" class="text-blue-400 text-sm font-semibold">Dashboard</a>
+    <hr class="border-slate-700" />
+    <select class="border border-slate-700 bg-slate-950 text-slate-200 rounded px-2 py-1 text-xs">
+      <option>EN</option>
+      <option>HI</option>
+    </select>
+    <button onclick="handleLogout()" class="mt-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 font-medium">Logout</button>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-10 space-y-6 sm:space-y-8">
+    
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
+      <div>
+        <h1 class="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight">Analytics Dashboard</h1>
+        <p class="text-xs sm:text-sm text-slate-400 mt-1">Track your progress and productivity insights</p>
+      </div>
+      <div class="flex items-center gap-2 text-xs sm:text-sm">
+        <span class="text-slate-400">Streak:</span>
+        <span id="streakBadge" class="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-300 border border-emerald-500/40 font-semibold">
+          🔥 0 days
+        </span>
+      </div>
+    </div>
+
+    <!-- Stats Overview -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
+      
+      <!-- Total Tasks Completed -->
+      <div class="bg-slate-900 border border-slate-800 rounded-xl sm:rounded-2xl p-4 sm:p-6">
+        <div class="flex items-center justify-between mb-2 sm:mb-3">
+          <h3 class="text-xs sm:text-sm text-slate-400">Total Tasks</h3>
+          <i class="fa-solid fa-check-circle text-blue-400 text-sm sm:text-base"></i>
+        </div>
+        <p id="totalTasksCompleted" class="text-2xl sm:text-3xl font-bold text-white">0</p>
+        <p class="text-[10px] sm:text-xs text-slate-500 mt-1">Completed overall</p>
+      </div>
+
+      <!-- Total Focus Sessions -->
+      <div class="bg-slate-900 border border-slate-800 rounded-xl sm:rounded-2xl p-4 sm:p-6">
+        <div class="flex items-center justify-between mb-2 sm:mb-3">
+          <h3 class="text-xs sm:text-sm text-slate-400">Focus Sessions</h3>
+          <i class="fa-solid fa-clock text-purple-400 text-sm sm:text-base"></i>
+        </div>
+        <p id="totalSessions" class="text-2xl sm:text-3xl font-bold text-white">0</p>
+        <p class="text-[10px] sm:text-xs text-slate-500 mt-1">Completed sessions</p>
+      </div>
+
+      <!-- Total Focus Minutes -->
+      <div class="bg-slate-900 border border-slate-800 rounded-xl sm:rounded-2xl p-4 sm:p-6">
+        <div class="flex items-center justify-between mb-2 sm:mb-3">
+          <h3 class="text-xs sm:text-sm text-slate-400">Focus Time</h3>
+          <i class="fa-solid fa-hourglass-half text-emerald-400 text-sm sm:text-base"></i>
+        </div>
+        <p id="totalMinutes" class="text-2xl sm:text-3xl font-bold text-white">0</p>
+        <p class="text-[10px] sm:text-xs text-slate-500 mt-1">Minutes focused</p>
+      </div>
+
+      <!-- Average Session -->
+      <div class="bg-slate-900 border border-slate-800 rounded-xl sm:rounded-2xl p-4 sm:p-6">
+        <div class="flex items-center justify-between mb-2 sm:mb-3">
+          <h3 class="text-xs sm:text-sm text-slate-400">Avg Session</h3>
+          <i class="fa-solid fa-chart-line text-yellow-400 text-sm sm:text-base"></i>
+        </div>
+        <p id="avgDuration" class="text-2xl sm:text-3xl font-bold text-white">0</p>
+        <p class="text-[10px] sm:text-xs text-slate-500 mt-1">Minutes per session</p>
+      </div>
+
+    </div>
+
+    <!-- Daily Performance & Weekly Chart Row -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+      
+      <!-- Daily Task Performance -->
+      <div class="bg-slate-900 border border-slate-800 rounded-xl sm:rounded-2xl p-4 sm:p-6">
+        <h3 class="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Today's Performance</h3>
+        
+        <div class="space-y-3 sm:space-y-4">
+          <div>
+            <div class="flex justify-between text-xs sm:text-sm mb-2">
+              <span class="text-slate-400">Tasks Progress</span>
+              <span id="todayTasksRatio" class="text-white font-semibold">0 / 0</span>
+            </div>
+            <div class="h-2 bg-slate-800 rounded-full overflow-hidden">
+              <div id="todayTasksProgress" class="h-full bg-blue-500 transition-all duration-300" style="width: 0%"></div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3 sm:gap-4 pt-2">
+            <div class="bg-slate-950 border border-slate-800 rounded-lg p-2 sm:p-3">
+              <p class="text-[10px] sm:text-xs text-slate-500">Completed</p>
+              <p id="todayCompleted" class="text-lg sm:text-xl font-bold text-emerald-400">0</p>
+            </div>
+            <div class="bg-slate-950 border border-slate-800 rounded-lg p-2 sm:p-3">
+              <p class="text-[10px] sm:text-xs text-slate-500">Pending</p>
+              <p id="todayPending" class="text-lg sm:text-xl font-bold text-slate-400">0</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Weekly Progress Chart -->
+      <div class="bg-slate-900 border border-slate-800 rounded-xl sm:rounded-2xl p-4 sm:p-6">
+        <h3 class="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Weekly Activity</h3>
+        
+        <div class="flex items-end justify-between gap-1 sm:gap-2 h-32 sm:h-40">
+          <div id="weekChart" class="flex items-end justify-between gap-2 w-full h-full">
+            <!-- Chart bars will be inserted here -->
+          </div>
+        </div>
+
+        <div class="flex justify-between text-xs text-slate-500 mt-2">
+          <span>Last 7 days</span>
+          <span id="weekTotal">0 tasks</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Monthly Calendar & Achievements Row -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      
+      <!-- Monthly Calendar View -->
+      <div class="bg-slate-900 border border-slate-800 rounded-xl sm:rounded-2xl p-4 sm:p-6">
+        <div class="flex items-center justify-between mb-3 sm:mb-4">
+          <h3 class="text-base sm:text-lg font-semibold">Monthly Progress</h3>
+          <div class="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm text-slate-400">
+            <button id="prevMonth" class="px-1.5 sm:px-2 py-0.5 sm:py-1 rounded hover:bg-slate-800 transition">
+              <i class="fa-solid fa-chevron-left"></i>
+            </button>
+            <span id="currentMonth" class="font-semibold text-white min-w-24 sm:min-w-32 text-center text-xs sm:text-sm">December 2025</span>
+            <button id="nextMonth" class="px-1.5 sm:px-2 py-0.5 sm:py-1 rounded hover:bg-slate-800 transition">
+              <i class="fa-solid fa-chevron-right"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Calendar Grid -->
+        <div class="space-y-1">
+          <!-- Day Headers -->
+          <div class="grid grid-cols-7 text-[10px] sm:text-xs text-slate-500 text-center font-semibold mb-1 sm:mb-2">
+            <div class="py-1">Sun</div>
+            <div class="py-1">Mon</div>
+            <div class="py-1">Tue</div>
+            <div class="py-1">Wed</div>
+            <div class="py-1">Thu</div>
+            <div class="py-1">Fri</div>
+            <div class="py-1">Sat</div>
+          </div>
+          
+          <!-- Calendar Days -->
+          <div id="calendarGrid" class="grid grid-cols-7">
+            <!-- Days will be inserted here -->
+          </div>
+        </div>
+
+        <!-- Legend -->
+        <div class="flex items-center justify-center gap-4 mt-4 text-xs text-slate-400">
+          <div class="flex items-center gap-1">
+            <div class="w-3 h-3 rounded bg-slate-800"></div>
+            <span>No activity</span>
+          </div>
+          <div class="flex items-center gap-1">
+            <div class="w-3 h-3 rounded bg-emerald-500/20"></div>
+            <span>Low</span>
+          </div>
+          <div class="flex items-center gap-1">
+            <div class="w-3 h-3 rounded bg-emerald-500/50"></div>
+            <span>Medium</span>
+          </div>
+          <div class="flex items-center gap-1">
+            <div class="w-3 h-3 rounded bg-emerald-500"></div>
+            <span>High</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Achievements System -->
+      <div class="bg-slate-900 border border-slate-800 rounded-xl sm:rounded-2xl p-4 sm:p-6">
+        <h3 class="text-base sm:text-lg font-semibold mb-3 sm:mb-4">
+          <i class="fa-solid fa-trophy text-yellow-400 mr-2"></i>
+          Achievements
+        </h3>
+        
+        <div id="achievementsList" class="space-y-2 max-h-[500px] overflow-y-auto pr-2">
+          <!-- Achievements will be rendered here -->
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Recent Sessions (Full Width) -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      
+      <!-- Important Notes -->
+      <div class="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-xl sm:rounded-2xl p-4 sm:p-6">
+        <div class="flex items-center justify-between mb-3 sm:mb-4">
+          <h3 class="text-base sm:text-lg font-semibold">
+            <i class="fa-solid fa-sticky-note text-yellow-400 mr-2"></i>
+            Important Notes
+          </h3>
+          <div class="flex items-center gap-2">
+            <button id="saveNotes" class="p-2 text-slate-500 hover:text-blue-400 transition" title="Save notes">
+              <i class="fa-solid fa-floppy-disk text-base"></i>
+            </button>
+            <button id="clearNotes" class="p-2 text-slate-500 hover:text-red-400 transition" title="Clear all notes">
+              <i class="fa-solid fa-trash text-base"></i>
+            </button>
+          </div>
+        </div>
+        
+        <textarea id="notesArea" 
+          placeholder="Write your important notes here... &#10;&#10;• Quick reminders&#10;• Important tasks&#10;• Ideas and thoughts&#10;• Anything you need to remember"
+          class="w-full h-64 bg-slate-950 border border-slate-800 rounded-lg p-4 text-sm text-slate-200 placeholder-slate-600 focus:outline-none focus:border-blue-500 resize-none transition"
+        ></textarea>
+        
+        <div class="flex items-center justify-between mt-3 text-xs text-slate-500">
+          <span id="charCount">0 characters</span>
+        </div>
+      </div>
+
+      <!-- Profile & Subscription -->
+      <div class="bg-slate-900 border border-slate-800 rounded-xl sm:rounded-2xl p-4 sm:p-6 space-y-4 sm:space-y-6">
+        
+        <!-- Profile -->
+        <div class="text-center space-y-3">
+          <div class="w-16 h-16 rounded-full bg-blue-500/20 border-2 border-blue-500 mx-auto flex items-center justify-center">
+            <i class="fa-solid fa-user text-2xl text-blue-400"></i>
+          </div>
+          <div>
+            <p id="userName" class="font-semibold text-white">User</p>
+            <p id="userEmail" class="text-xs text-slate-400">user@grovity.app</p>
+          </div>
+        </div>
+
+        <hr class="border-slate-800" />
+
+        <!-- Subscription -->
+        <div class="space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-slate-400">Current Plan</span>
+            <span id="currentPlan" class="text-sm font-semibold text-purple-400">Starter</span>
+          </div>
+          <button onclick="location.href='index.html#pricing'" 
+            class="w-full py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 text-sm font-medium transition">
+            Upgrade Plan
+          </button>
+        </div>
+
+        <hr class="border-slate-800" />
+
+        <!-- Actions -->
+        <div class="space-y-2">
+          <button id="contactSupport" 
+            class="w-full py-2 border border-slate-700 text-slate-300 rounded-lg hover:border-blue-400 hover:text-blue-300 text-sm transition">
+            <i class="fa-solid fa-headset mr-2"></i>Contact Support
+          </button>
+          <button onclick="location.href='workspace.html'" 
+            class="w-full py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 text-sm font-medium transition">
+            Go to Workspace
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="mt-20 border-t border-slate-800 pt-10 pb-6 bg-slate-950">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 grid gap-6 sm:gap-10 grid-cols-2 md:grid-cols-4 text-xs sm:text-sm">
+
+      <!-- Brand -->
+      <div class="space-y-3">
+        <h3 class="text-xl font-bold text-blue-400 tracking-tight">Grovity</h3>
+        <p class="text-slate-400 text-xs leading-relaxed">
+          Focus. Track. Grow.
+          Turn deep focus into measurable progress.
+        </p>
+      </div>
+
+      <!-- Product Links -->
+      <div class="space-y-3">
+        <h4 class="text-slate-200 font-semibold text-sm">Product</h4>
+        <ul class="space-y-2 text-slate-400">
+          <li><a href="index.html#features" class="hover:text-blue-400 transition">Features</a></li>
+          <li><a href="index.html#pricing" class="hover:text-blue-400 transition">Pricing</a></li>
+          <li><a href="workspace.html" class="hover:text-blue-400 transition">Workspace</a></li>
+        </ul>
+      </div>
+
+      <!-- Company -->
+      <div class="space-y-3">
+        <h4 class="text-slate-200 font-semibold text-sm">Company</h4>
+        <ul class="space-y-2 text-slate-400">
+          <li><a href="#" class="hover:text-blue-400 transition">About</a></li>
+          <li><a href="#" class="hover:text-blue-400 transition">Careers</a></li>
+          <li><a href="#" class="hover:text-blue-400 transition">Contact</a></li>
+        </ul>
+      </div>
+
+      <!-- Stay Connected -->
+      <div class="space-y-3">
+        <h4 class="text-slate-200 font-semibold text-sm">Stay Connected</h4>
+        <div class="flex gap-4 text-slate-400 text-lg">
+          <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" class="hover:text-blue-400 transition" aria-label="Twitter">
+            <i class="fa-brands fa-x-twitter"></i>
+          </a>
+          <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" class="hover:text-blue-400 transition" aria-label="LinkedIn">
+            <i class="fa-brands fa-linkedin-in"></i>
+          </a>
+          <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" class="hover:text-blue-400 transition" aria-label="Instagram">
+            <i class="fa-brands fa-instagram"></i>
+          </a>
+          <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" class="hover:text-blue-400 transition" aria-label="YouTube">
+            <i class="fa-brands fa-youtube"></i>
+          </a>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="max-w-7xl mx-auto px-6 mt-10 flex flex-wrap items-center justify-between text-xs text-slate-500">
+      <p>© 2025 Grovity. All rights reserved.</p>
+      <div class="flex gap-4">
+        <a href="#" class="hover:text-blue-400 transition">Privacy</a>
+        <a href="#" class="hover:text-blue-400 transition">Terms</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Support Modal -->
+  <div id="supportModal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 p-4">
+    <div class="flex items-center justify-center w-full h-full">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl p-8 w-full max-w-md space-y-6">
+      <div class="text-center">
+        <h3 class="text-2xl font-bold text-blue-400">Need Help?</h3>
+        <p class="text-sm text-slate-400 mt-2">We're here to assist you</p>
+      </div>
+
+      <div class="space-y-4">
+        <a href="mailto:support@grovity.app" 
+          class="block w-full py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 text-center font-medium transition">
+          <i class="fa-solid fa-envelope mr-2"></i>Email Support
+        </a>
+        <a href="https://twitter.com" target="_blank" rel="noopener noreferrer"
+          class="block w-full py-3 border border-slate-700 text-slate-300 rounded-lg hover:border-blue-400 hover:text-blue-300 text-center transition">
+          <i class="fa-brands fa-twitter mr-2"></i>Tweet @Grovity
+        </a>
+      </div>
+
+      <button id="closeSupportModal" 
+        class="w-full py-2 text-slate-400 hover:text-white transition text-sm">
+        Close
+      </button>
+    </div>
+    </div>
+  </div>
+
+  <!-- SCRIPTS -->
+  <script src="./src/js/sync.js?v=7"></script>
+  <script src="./src/js/dashboard.js?v=7"></script>
+
+  <!-- Theme Toggle -->
+  <button onclick="toggleTheme()" class="theme-toggle" aria-label="Toggle theme">
+    <i id="themeIcon" class="fa-solid fa-sun"></i>
+  </button>
+
+  <script src="./theme-system.js"></script>
+</body>
+
+</html>

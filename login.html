@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login – Grovity</title>
+  <link rel="stylesheet" href="./dist/output.css" />
+  <link rel="stylesheet" href="./theme-system.css" />
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+  />
+</head>
+<body class="bg-slate-950 text-slate-100 flex min-h-screen flex-col">
+
+  <!-- Simple Navbar (Login Page) -->
+  <nav class="bg-slate-950/80 border-b border-slate-800 px-3 sm:px-4 md:px-10 py-3">
+    <div class="flex items-center justify-between max-w-7xl mx-auto w-full">
+      <a href="index.html" class="text-xl sm:text-2xl font-bold tracking-tight text-blue-400">
+        Grovity
+      </a>
+      <a href="index.html" class="text-xs sm:text-sm text-slate-300 hover:text-blue-400 transition">
+        Back to home
+      </a>
+    </div>
+  </nav>
+
+  <!-- Login Content -->
+  <main class="flex-1 flex items-center justify-center px-4 py-10">
+    <div class="w-full max-w-md space-y-8">
+      <div class="text-center space-y-2">
+        <p class="text-xs font-semibold tracking-[0.2em] text-blue-400 uppercase">
+          Welcome back
+        </p>
+        <h1 class="text-2xl md:text-3xl font-bold tracking-tight">
+          Log in to <span class="text-blue-400">Grovity</span>
+        </h1>
+        <p class="text-xs md:text-sm text-slate-400">
+          Continue your focus streak and pick up your tasks where you left off.
+        </p>
+      </div>
+
+      <form class="space-y-4 sm:space-y-5 bg-slate-900/70 border border-slate-800 rounded-xl sm:rounded-2xl p-5 sm:p-6 shadow-lg">
+        <div class="space-y-1 text-left">
+          <label for="email" class="block text-xs font-medium text-slate-300">
+            Email
+          </label>
+          <input
+            id="email"
+            type="email"
+            class="w-full rounded-lg border border-slate-800 bg-slate-950 px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-blue-500"
+            placeholder="you@example.com"
+          />
+        </div>
+
+        <div class="space-y-1 text-left">
+          <label for="password" class="block text-xs font-medium text-slate-300">
+            Password
+          </label>
+          <input
+            id="password"
+            type="password"
+            class="w-full rounded-lg border border-slate-800 bg-slate-950 px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-blue-500"
+            placeholder="••••••••"
+          />
+        </div>
+
+        <div class="flex items-center justify-between text-xs text-slate-400">
+          <label class="inline-flex items-center gap-2">
+            <input type="checkbox" class="h-3 w-3 rounded border-slate-700 bg-slate-950" />
+            <span>Keep me logged in</span>
+          </label>
+          <a href="#" class="hover:text-blue-400">Forgot password?</a>
+        </div>
+
+        <button
+          type="submit"
+          class="w-full py-2.5 rounded-lg bg-blue-500 text-white text-sm font-medium hover:bg-blue-600 active:bg-blue-700 transition"
+        >
+          Log in
+        </button>
+
+        <div class="flex items-center gap-2 text-[11px] text-slate-500">
+          <div class="h-px flex-1 bg-slate-800"></div>
+          <span>or</span>
+          <div class="h-px flex-1 bg-slate-800"></div>
+        </div>
+
+        <button
+          type="button"
+          class="w-full py-2.5 rounded-lg border border-slate-700 text-slate-200 text-sm font-medium hover:border-blue-400 hover:text-blue-300 transition flex items-center justify-center gap-2"
+        >
+          <i class="fa-brands fa-google text-base"></i>
+          Continue with Google
+        </button>
+      </form>
+
+      <p class="text-center text-xs md:text-sm text-slate-400">
+        New to Grovity?
+        <a href="signup.html" class="text-blue-400 hover:text-blue-300 font-medium">
+          Create an account
+        </a>
+      </p>
+    </div>
+  </main>
+
+  <script>
+    // Handle form submission
+    document.querySelector('form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      // Simulate login - in real app, validate credentials
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      
+      if (email && password) {
+        // Save user data
+        localStorage.setItem('grovity_user', JSON.stringify({ email: email, name: email.split('@')[0] }));
+        
+        // Check if there was a selected plan before login
+        const selectedPlan = localStorage.getItem('grovity_selected_plan');
+        if (selectedPlan) {
+          localStorage.setItem('grovity_plan', selectedPlan);
+          localStorage.removeItem('grovity_selected_plan');
+        }
+        
+        // Check if there's a redirect destination
+        const redirectTo = localStorage.getItem('grovity_redirect_after_login');
+        localStorage.removeItem('grovity_redirect_after_login');
+        
+        if (redirectTo) {
+          window.location.href = redirectTo;
+        } else {
+          window.location.href = 'workspace.html';
+        }
+      }
+    });
+  </script>
+
+  <!-- Theme Toggle -->
+  <button onclick="toggleTheme()" class="theme-toggle" aria-label="Toggle theme">
+    <i id="themeIcon" class="fa-solid fa-sun"></i>
+  </button>
+
+  <script src="./theme-system.js"></script>
+</body>
+</html>

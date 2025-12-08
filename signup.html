@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign Up – Grovity</title>
+  <link rel="stylesheet" href="./dist/output.css" />
+  <link rel="stylesheet" href="./theme-system.css" />
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+  />
+</head>
+<body class="bg-slate-950 text-slate-100 flex min-h-screen flex-col">
+
+  <nav class="bg-slate-950/80 border-b border-slate-800 px-3 sm:px-4 md:px-10 py-3">
+    <div class="flex items-center justify-between max-w-7xl mx-auto w-full">
+      <a href="index.html" class="text-xl sm:text-2xl font-bold tracking-tight text-blue-400">
+        Grovity
+      </a>
+      <a href="login.html" class="text-xs sm:text-sm text-slate-300 hover:text-blue-400 transition">
+        Already have an account? Log in
+      </a>
+    </div>
+  </nav>
+
+  <main class="flex-1 flex items-center justify-center px-4 py-10">
+    <div class="w-full max-w-md space-y-8">
+      <div class="text-center space-y-2">
+        <p class="text-xs font-semibold tracking-[0.2em] text-purple-400 uppercase">
+          Get started
+        </p>
+        <h1 class="text-2xl md:text-3xl font-bold tracking-tight">
+          Create your <span class="text-purple-400">Grovity</span> account
+        </h1>
+        <p class="text-xs md:text-sm text-slate-400">
+          Save your tasks, focus sessions and progress securely across devices.
+        </p>
+      </div>
+
+      <form class="space-y-4 sm:space-y-5 bg-slate-900/70 border border-slate-800 rounded-xl sm:rounded-2xl p-5 sm:p-6 shadow-lg">
+        <div class="space-y-1 text-left">
+          <label for="name" class="block text-xs font-medium text-slate-300">
+            Full name
+          </label>
+          <input
+            id="name"
+            type="text"
+            class="w-full rounded-lg border border-slate-800 bg-slate-950 px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-purple-500"
+            placeholder="John Doe"
+          />
+        </div>
+
+        <div class="space-y-1 text-left">
+          <label for="email" class="block text-xs font-medium text-slate-300">
+            Email
+          </label>
+          <input
+            id="email"
+            type="email"
+            class="w-full rounded-lg border border-slate-800 bg-slate-950 px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-purple-500"
+            placeholder="you@example.com"
+          />
+        </div>
+
+        <div class="space-y-1 text-left">
+          <label for="password" class="block text-xs font-medium text-slate-300">
+            Password
+          </label>
+          <input
+            id="password"
+            type="password"
+            class="w-full rounded-lg border border-slate-800 bg-slate-950 px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-purple-500"
+            placeholder="••••••••"
+          />
+        </div>
+
+        <div class="space-y-1 text-left">
+          <label for="confirm" class="block text-xs font-medium text-slate-300">
+            Confirm password
+          </label>
+          <input
+            id="confirm"
+            type="password"
+            class="w-full rounded-lg border border-slate-800 bg-slate-950 px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-purple-500"
+            placeholder="••••••••"
+          />
+        </div>
+
+        <div class="text-[11px] text-slate-500">
+          By creating an account, you agree to our
+          <a href="#" class="text-purple-300 hover:text-purple-200">Terms</a>
+          and
+          <a href="#" class="text-purple-300 hover:text-purple-200">Privacy Policy</a>.
+        </div>
+
+        <button
+          type="submit"
+          class="w-full py-2.5 rounded-lg bg-purple-500 text-white text-sm font-medium hover:bg-purple-600 active:bg-purple-700 transition"
+        >
+          Sign up
+        </button>
+
+        <button
+          type="button"
+          class="w-full py-2.5 rounded-lg border border-slate-700 text-slate-200 text-sm font-medium hover:border-purple-400 hover:text-purple-300 transition flex items-center justify-center gap-2"
+        >
+          <i class="fa-brands fa-google text-base"></i>
+          Sign up with Google
+        </button>
+      </form>
+    </div>
+  </main>
+
+  <script>
+    // Handle form submission
+    document.querySelector('form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      // Get form values
+      const name = document.getElementById('name').value;
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const confirm = document.getElementById('confirm').value;
+      
+      // Basic validation
+      if (password !== confirm) {
+        alert('Passwords do not match!');
+        return;
+      }
+      
+      if (name && email && password) {
+        // Save user data
+        localStorage.setItem('grovity_user', JSON.stringify({ email: email, name: name }));
+        
+        // Check if there was a selected plan before signup
+        const selectedPlan = localStorage.getItem('grovity_selected_plan');
+        if (selectedPlan) {
+          localStorage.setItem('grovity_plan', selectedPlan);
+          localStorage.removeItem('grovity_selected_plan');
+        }
+        
+        // Check if there's a redirect destination
+        const redirectTo = localStorage.getItem('grovity_redirect_after_login');
+        localStorage.removeItem('grovity_redirect_after_login');
+        
+        if (redirectTo) {
+          window.location.href = redirectTo;
+        } else {
+          window.location.href = 'workspace.html';
+        }
+      }
+    });
+  </script>
+
+  <!-- Theme Toggle -->
+  <button onclick="toggleTheme()" class="theme-toggle" aria-label="Toggle theme">
+    <i id="themeIcon" class="fa-solid fa-sun"></i>
+  </button>
+
+  <script src="./theme-system.js"></script>
+</body>
+</html>

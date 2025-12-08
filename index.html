@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Grovity – Focus. Track. Grow.</title>
+  <link rel="stylesheet" href="./dist/output.css" />
+  <link rel="stylesheet" href="./theme-system.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+</head>
+
+<body class="bg-slate-950 text-slate-100 leading-relaxed md:text-[16px] lg:text-[17px]">
+  <nav class="bg-slate-950/80 backdrop-blur border-b border-slate-800 px-3 sm:px-6 py-3">
+    <div class="flex items-center justify-between px-2 sm:px-4 md:px-10 w-full relative">
+
+      <a href="index.html" class="text-xl sm:text-2xl font-bold tracking-tight text-blue-400">
+        Grovity
+      </a>
+
+      <ul class="hidden lg:flex gap-10 text-sm font-medium text-slate-200 absolute left-1/2 -translate-x-1/2">
+        <li><a href="#product" class="hover:text-blue-400 transition">Home</a></li>
+        <li><a href="#" onclick="requireLogin('#pricing'); return false;" class="hover:text-blue-400 transition">Pricing</a></li>
+        <li><a href="#" onclick="requireLogin('workspace.html'); return false;" class="hover:text-blue-400 transition">Workspace</a></li>
+        <li><a href="#" onclick="requireLogin('dashboard.html'); return false;" class="hover:text-blue-400 transition">Dashboard</a></li>
+      </ul>
+
+      <div class="hidden lg:flex items-center gap-4 text-sm">
+        <select class="border border-slate-700 bg-slate-900 text-slate-200 rounded px-2 py-1 text-xs">
+          <option>EN</option>
+          <option>HI</option>
+        </select>
+        <!-- Show Login/Signup when NOT logged in -->
+        <a href="login.html" id="navLoginBtn" class="text-slate-200 hover:text-blue-400 font-medium transition">Login</a>
+        <button id="navSignupBtn" onclick="location.href='signup.html'"
+          class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 active:bg-blue-700 font-medium text-sm transition">
+          Sign Up
+        </button>
+        <!-- Show Enter Workspace/Logout when logged in -->
+        <button id="navWorkspaceBtn" onclick="location.href='workspace.html'" style="display: none;"
+          class="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 active:bg-purple-700 font-medium text-sm transition">
+          Enter Workspace
+        </button>
+        <button id="navLogoutBtn" onclick="handleLogout()" style="display: none;"
+          class="px-4 py-2 border border-slate-700 text-slate-200 rounded-lg hover:border-red-400 hover:text-red-400 font-medium text-sm transition">
+          Logout
+        </button>
+      </div>
+
+      <button id="menuBtn" class="lg:hidden p-2 border border-slate-700 rounded text-slate-200">
+        ☰
+      </button>
+
+    </div>
+  </nav>
+
+  <div id="overlay" class="hidden fixed inset-0 bg-black/60 z-30"></div>
+
+  <!-- SIDEBAR -->
+  <aside id="sidebar"
+    class="fixed top-0 right-0 h-full w-64 bg-slate-900 shadow-lg z-40 transform translate-x-full transition-transform duration-300 flex flex-col gap-6 p-6 text-slate-100 lg:hidden">
+
+    <button id="closeBtn" class="self-end text-2xl font-bold leading-none">×</button>
+
+    <a href="#product" class="hover:text-blue-400 text-sm font-medium">Home</a>
+    <a href="#" onclick="requireLogin('#pricing'); return false;" class="hover:text-blue-400 text-sm font-medium">Pricing</a>
+    <a href="#" onclick="requireLogin('workspace.html'); return false;" class="hover:text-blue-400 text-sm font-medium">Workspace</a>
+    <a href="#" onclick="requireLogin('dashboard.html'); return false;" class="hover:text-blue-400 text-sm font-medium">Dashboard</a>
+
+    <hr class="border-slate-700">
+
+    <select class="border border-slate-700 bg-slate-950 text-slate-200 rounded px-2 py-1 text-xs">
+      <option>EN</option>
+      <option>HI</option>
+    </select>
+
+    <!-- Show Login/Signup when NOT logged in -->
+    <a href="login.html" id="sidebarLoginBtn" class="hover:text-blue-400 text-sm font-medium">Login</a>
+    <button id="sidebarSignupBtn" onclick="location.href='signup.html'"
+      class="mt-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 active:bg-blue-700 font-medium text-sm transition">
+      Sign Up
+    </button>
+
+    <!-- Show Enter Workspace/Logout when logged in -->
+    <button id="sidebarWorkspaceBtn" onclick="location.href='workspace.html'" style="display: none;"
+      class="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 active:bg-purple-700 font-medium text-sm transition">
+      Enter Workspace
+    </button>
+    <button id="sidebarLogoutBtn" onclick="handleLogout()" style="display: none;"
+      class="px-4 py-2 border border-slate-700 text-slate-200 rounded-lg hover:border-red-400 hover:text-red-400 font-medium text-sm transition">
+      Logout
+    </button>
+
+  </aside>
+
+  <!-- No Plan Selected Popup -->
+  <div id="noPlanPopup" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 p-4">
+    <div class="flex items-center justify-center w-full h-full">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl p-8 w-full max-w-md text-center space-y-6 shadow-xl">
+      <div class="w-16 h-16 rounded-full bg-purple-500/20 border-2 border-purple-500 mx-auto flex items-center justify-center">
+        <i class="fa-solid fa-crown text-3xl text-purple-400"></i>
+      </div>
+      <div>
+        <h3 class="text-2xl font-bold text-white mb-2">Select a Plan First</h3>
+        <p class="text-sm text-slate-400">Choose a subscription plan to access Workspace and Dashboard</p>
+      </div>
+      <button onclick="closeNoPlanPopup()" 
+        class="w-full py-3 bg-purple-500 text-white rounded-lg hover:bg-purple-600 font-medium transition">
+        View Plans
+      </button>
+    </div>
+    </div>
+  </div>
+
+  <!-- Plan Selected Success Popup -->
+  <div id="planSelectedPopup" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 p-4">
+    <div class="flex items-center justify-center w-full h-full">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl p-8 w-full max-w-md text-center space-y-6 shadow-xl">
+      <div class="w-16 h-16 rounded-full bg-emerald-500/20 border-2 border-emerald-500 mx-auto flex items-center justify-center">
+        <i class="fa-solid fa-check text-3xl text-emerald-400"></i>
+      </div>
+      <div>
+        <h3 class="text-2xl font-bold text-white mb-2">Plan Selected!</h3>
+        <p class="text-sm text-slate-400">You've selected the <span id="selectedPlanName" class="text-purple-400 font-semibold"></span> plan</p>
+        <p class="text-xs text-slate-500 mt-2">Redirecting to workspace...</p>
+      </div>
+    </div>
+    </div>
+  </div>
+
+  <main class="max-w-7xl mx-auto px-6 pt-16 pb-20 space-y-16">
+    <section id="product" class="grid gap-10 md:grid-cols-2 md:items-center text-center md:text-left">
+      <div class="space-y-6">
+        <p class="text-xs font-semibold tracking-[0.2em] text-blue-400 uppercase">
+          Focus • Tasks • Time
+        </p>
+        <h1 class="text-3xl md:text-5xl font-bold tracking-tight">
+          Turn deep focus into <span class="text-blue-400">measurable progress</span>.
+        </h1>
+        <p class="text-slate-300 text-sm md:text-base leading-relaxed">
+          Grovity combines task tracking, focus sessions, and progress analytics into a single clean dashboard.
+          Designed for students, solo builders, and teams who actually care about their time.
+        </p>
+
+        <div class="flex flex-wrap gap-4 justify-center md:justify-start">
+          <button onclick="redirectToWorkspace()"
+            class="px-5 py-2.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600 active:bg-blue-700 font-medium text-sm transition shadow-lg hover:shadow-xl">
+            Start a Focus Session
+          </button>
+          <button onclick="scrollToReviews()"
+            class="px-5 py-2.5 border border-slate-700 text-slate-200 rounded-lg hover:border-blue-400 hover:text-blue-300 font-medium text-sm transition">
+            View Reviews
+          </button>
+        </div>
+
+        <div class="flex flex-wrap gap-3 sm:gap-6 pt-2 sm:pt-4 text-[10px] sm:text-xs text-slate-300 justify-center md:justify-start">
+          <div>
+            <div class="text-lg font-semibold text-white">+120h</div>
+            <div class="text-slate-500">Focused time logged</div>
+          </div>
+          <div>
+            <div class="text-lg font-semibold text-white">87%</div>
+            <div class="text-slate-500">Tasks completed on time</div>
+          </div>
+          <div>
+            <div class="text-lg font-semibold text-white">4.8★</div>
+            <div class="text-slate-500">User satisfaction score</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="relative w-full max-w-sm mx-auto md:max-w-none">
+        <div class="absolute -inset-4 sm:-inset-6 bg-blue-500/10 blur-3xl rounded-full"></div>
+        <div class="relative bg-slate-900 border border-slate-800 rounded-xl sm:rounded-2xl p-4 sm:p-5 flex flex-col gap-3 sm:gap-4 shadow-lg">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-xs text-slate-400">Current focus</p>
+              <p id="currentFocusTask" class="text-sm font-semibold text-slate-100">No active session</p>
+            </div>
+            <span id="focusStatus"
+              class="text-[10px] px-2 py-1 rounded-full bg-slate-500/10 text-slate-400 border border-slate-500/40">
+              Idle
+            </span>
+          </div>
+
+          <div id="timerDisplayHome" class="flex items-center justify-center gap-1 sm:gap-2 text-3xl sm:text-4xl font-semibold text-slate-50">
+            <span id="timerMins">00</span><span class="text-base sm:text-lg text-slate-500">:</span><span id="timerSecs">00</span>
+          </div>
+
+          <div class="h-2 rounded-full bg-slate-800 overflow-hidden">
+            <div id="progressBarHome" class="h-full w-0 bg-blue-500 transition-all duration-300"></div>
+          </div>
+
+          <div class="grid grid-cols-3 gap-2 sm:gap-3 text-[10px] sm:text-[11px]">
+            <div class="rounded-lg border border-slate-800 bg-slate-900/60 p-1.5 sm:p-2">
+              <p class="text-slate-400">Today</p>
+              <p id="sessionsToday" class="text-xs sm:text-sm font-semibold text-slate-100">0 sessions</p>
+            </div>
+            <div class="rounded-lg border border-slate-800 bg-slate-900/60 p-1.5 sm:p-2">
+              <p class="text-slate-400">Tasks</p>
+              <p id="tasksToday" class="text-xs sm:text-sm font-semibold text-slate-100">0 total</p>
+            </div>
+            <div class="rounded-lg border border-slate-800 bg-slate-900/60 p-1.5 sm:p-2">
+              <p class="text-slate-400">Streak</p>
+              <p id="streakCount" class="text-xs sm:text-sm font-semibold text-emerald-300">0 days</p>
+            </div>
+          </div>
+
+          <div class="flex justify-between items-center mt-2 text-xs text-slate-400">
+            <span id="nextTaskPreview">Next: No pending tasks</span>
+            <a href="dashboard.html" class="text-blue-300 hover:text-blue-400 transition">View dashboard →</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="features" class="space-y-4 sm:space-y-6">
+      <div class="space-y-2 sm:space-y-3">
+        <p class="text-xl font-semibold tracking-[0.2em] text-blue-400 uppercase">
+          Why Grovity
+        </p>
+        <h2 class="text-xl md:text-2xl font-semibold tracking-tight text-slate-50">
+          Built for students, makers, and small teams.
+        </h2>
+        <p class="text-sm md:text-base text-slate-300 max-w-2xl">
+          Instead of juggling separate apps for tasks, timers, and progress, Grovity keeps everything in one clean
+          interface.
+          The dashboard you’ll build next will bring this landing page to life.
+        </p>
+      </div>
+
+      <div class="grid gap-4 md:grid-cols-3">
+        <div class="rounded-2xl border border-slate-800 bg-slate-900/60 p-4 space-y-2">
+          <h3 class="text-base md:text-lg font-semibold text-slate-100">
+            Task + Time in one place</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">
+            Link focus sessions directly to tasks and see how much real time each item actually consumes.
+          </p>
+        </div>
+        <div class="rounded-2xl border border-slate-800 bg-slate-900/60 p-4 space-y-2">
+          <h3 class="text-base md:text-lg font-semibold text-slate-100">
+            Forest-style focus loop</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">
+            Reward consistent focus with streaks and session stats, similar to forest-style productivity apps.
+          </p>
+        </div>
+        <div class="rounded-2xl border border-slate-800 bg-slate-900/60 p-4 space-y-2">
+          <h3 class="text-base md:text-lg font-semibold text-slate-100">
+            Dashboard-ready foundation</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">
+            This UI is designed to plug directly into a future backend, making it a perfect resume project.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing" class="space-y-6 sm:space-y-10 mt-6 sm:mt-10">
+      <div class="text-center space-y-2 sm:space-y-3">
+        <p class="text-xs font-semibold tracking-[0.2em] text-purple-400 uppercase">
+          Choose your plan
+        </p>
+        <h2 class="text-2xl md:text-3xl font-bold tracking-tight text-slate-50">
+          Pricing designed for focus and progress
+        </h2>
+        <p class="text-sm md:text-base text-slate-400 max-w-md mx-auto">
+          Start free, upgrade when you’re ready to push your productivity.
+        </p>
+      </div>
+
+      <div class="grid gap-4 sm:gap-6 md:grid-cols-3">
+
+        <!-- Starter -->
+        <div class="rounded-xl sm:rounded-2xl border border-slate-800 bg-slate-900/60 p-5 sm:p-6 hover:border-purple-500/50 transition flex flex-col justify-center">
+          <h3 class="text-lg font-semibold text-slate-100 mb-4">Starter</h3>
+          <p class="text-3xl font-bold text-white mb-4">Free</p>
+
+          <ul class="space-y-2 text-sm text-slate-400 mb-6">
+            <li class="flex items-center gap-2">
+              <i class="fa-solid fa-check text-emerald-400 text-xs"></i>
+              <span>10 tasks limit</span>
+            </li>
+            <li class="flex items-center gap-2">
+              <i class="fa-solid fa-check text-emerald-400 text-xs"></i>
+              <span>30 min focus timer</span>
+            </li>
+            <li class="flex items-center gap-2">
+              <i class="fa-solid fa-check text-emerald-400 text-xs"></i>
+              <span>Useful for students</span>
+            </li>
+            <li class="flex items-center gap-2">
+              <i class="fa-solid fa-check text-emerald-400 text-xs"></i>
+              <span>Single-device usage</span>
+            </li>
+          </ul>
+
+          <button onclick="selectPlan('Starter')" class="w-full py-2.5 rounded-lg bg-slate-800 text-slate-300 text-sm hover:bg-purple-500 hover:text-white hover:scale-105 hover:shadow-md active:scale-95 transition-all duration-300 cursor-pointer">
+            Get started
+          </button>
+        </div>
+
+        <!-- Pro (Recommended) -->
+        <div class="rounded-xl sm:rounded-2xl border border-purple-500 bg-slate-900 shadow-xl p-5 sm:p-6 md:scale-105">
+          <div
+            class="inline-block px-3 py-1 rounded-full text-[10px] bg-purple-500/20 text-purple-300 border border-purple-500/40 mb-3">
+            Most Popular
+          </div>
+
+          <h3 class="text-lg font-semibold text-white mb-4">Pro</h3>
+          <p class="text-3xl font-bold text-purple-400 mb-1">₹299/mo</p>
+          <p class="text-xs text-slate-500 mb-4">Billed monthly</p>
+
+          <ul class="space-y-2 text-sm text-slate-300 mb-6">
+            <li class="flex items-center gap-2">
+              <i class="fa-solid fa-check text-emerald-400 text-xs"></i>
+              <span>Unlimited tasks</span>
+            </li>
+            <li class="flex items-center gap-2">
+              <i class="fa-solid fa-check text-emerald-400 text-xs"></i>
+              <span>Full focus analytics</span>
+            </li>
+            <li class="flex items-center gap-2">
+              <i class="fa-solid fa-check text-emerald-400 text-xs"></i>
+              <span>Multi-device sync</span>
+            </li>
+            <li class="flex items-center gap-2">
+              <i class="fa-solid fa-check text-emerald-400 text-xs"></i>
+              <span>Priority support</span>
+            </li>
+          </ul>
+
+          <button onclick="selectPlan('Pro')" class="w-full py-2.5 rounded-lg bg-purple-500 text-white text-sm hover:bg-purple-600 hover:scale-105 hover:shadow-lg active:scale-95 transition-all duration-300 cursor-pointer">
+            Go Pro
+          </button>
+        </div>
+
+        <!-- Teams -->
+        <div class="rounded-xl sm:rounded-2xl border border-slate-800 bg-slate-900/60 p-5 sm:p-6 hover:border-purple-500/50 transition flex flex-col justify-center">
+          <h3 class="text-lg font-semibold text-slate-100 mb-4">Teams</h3>
+          <p class="text-3xl font-bold text-white mb-4">₹899/mo</p>
+
+          <ul class="space-y-2 text-sm text-slate-400 mb-6">
+            <li class="flex items-center gap-2">
+              <i class="fa-solid fa-check text-emerald-400 text-xs"></i>
+              <span>Team collaboration</span>
+            </li>
+            <li class="flex items-center gap-2">
+              <i class="fa-solid fa-check text-emerald-400 text-xs"></i>
+              <span>Shared analytics</span>
+            </li>
+            <li class="flex items-center gap-2">
+              <i class="fa-solid fa-check text-emerald-400 text-xs"></i>
+              <span>Roles & permissions</span>
+            </li>
+            <li class="flex items-center gap-2">
+              <i class="fa-solid fa-check text-emerald-400 text-xs"></i>
+              <span>24/7 support</span>
+            </li>
+          </ul>
+
+          <button onclick="selectPlan('Teams')" class="w-full py-2.5 rounded-lg bg-slate-800 text-slate-300 text-sm hover:bg-purple-500 hover:text-white hover:scale-105 hover:shadow-md active:scale-95 transition-all duration-300 cursor-pointer">
+            Contact sales
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- Testimonials -->
+    <section id="testimonials" class="space-y-6 sm:space-y-10 mt-6 sm:mt-10">
+      <div class="text-center space-y-2 sm:space-y-3">
+        <p class="text-xs font-semibold tracking-[0.2em] text-purple-400 uppercase">
+          Trusted by builders
+        </p>
+        <h2 class="text-2xl md:text-3xl font-bold tracking-tight text-slate-50">
+          What early users are saying
+        </h2>
+        <p class="text-sm md:text-base text-slate-400 max-w-md mx-auto">
+          People using Grovity already see real improvements in their focus and progress.
+        </p>
+      </div>
+
+      <div class="grid gap-4 sm:gap-6 md:grid-cols-3">
+
+        <!-- Card 1 -->
+        <div
+          class="rounded-xl sm:rounded-2xl border border-slate-800 bg-slate-900/60 p-4 sm:p-6 flex flex-col gap-3 sm:gap-4 hover:border-purple-500/40 transition">
+          <div class="flex items-center gap-3">
+            <img src="https://i.pravatar.cc/50?img=11" alt="user"
+              class="w-10 h-10 rounded-full border border-slate-800">
+            <div>
+              <p class="text-sm font-semibold text-slate-100">Docker Martin</p>
+              <p class="text-[11px] text-slate-500">Student</p>
+            </div>
+          </div>
+          <p class="text-sm text-slate-300 leading-relaxed">
+            Grovity helped me finish my semester projects on time.
+            My focus sessions doubled overnight.
+          </p>
+          <div class="text-xs text-purple-300">Focus streak: 9 days</div>
+        </div>
+
+        <!-- Card 2 (Featured) -->
+        <div class="rounded-xl sm:rounded-2xl border border-purple-500 bg-slate-900 shadow-xl p-4 sm:p-6 flex flex-col gap-3 sm:gap-4 md:scale-105">
+          <div class="flex items-center gap-3">
+            <img src="https://i.pravatar.cc/50?img=32" alt="user"
+              class="w-10 h-10 rounded-full border border-purple-500/40">
+            <div>
+              <p class="text-sm font-semibold text-white">Riley Hanna</p>
+              <p class="text-[11px] text-slate-500">Indie Hacker</p>
+            </div>
+          </div>
+          <p class="text-sm text-slate-200 leading-relaxed">
+            It’s like Forest + Todoist combined, but cleaner.
+            Love the dashboard analytics. Worth every rupee.
+          </p>
+          <div class="text-xs text-purple-300">Tasks completed: 76</div>
+        </div>
+
+        <!-- Card 3 -->
+        <div
+          class="rounded-xl sm:rounded-2xl border border-slate-800 bg-slate-900/60 p-4 sm:p-6 flex flex-col gap-3 sm:gap-4 hover:border-purple-500/40 transition">
+          <div class="flex items-center gap-3">
+            <img src="https://i.pravatar.cc/50?img=45" alt="user"
+              class="w-10 h-10 rounded-full border border-slate-800">
+            <div>
+              <p class="text-sm font-semibold text-slate-100">Nancy Stelwart</p>
+              <p class="text-[11px] text-slate-500">College Team Lead</p>
+            </div>
+          </div>
+          <p class="text-sm text-slate-300 leading-relaxed">
+            Our team tracks assignments together now.
+            Great for accountability. Dark mode is perfect.
+          </p>
+          <div class="text-xs text-purple-300">Team size: 6 members</div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Footer -->
+  </main>
+
+  <footer class="mt-20 border-t border-slate-800 pt-10 pb-6">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 grid gap-6 sm:gap-10 grid-cols-2 md:grid-cols-4 text-xs sm:text-sm">
+
+        <!-- Brand -->
+        <div class="space-y-3">
+          <h3 class="text-xl font-bold text-blue-400 tracking-tight">Grovity</h3>
+          <p class="text-slate-400 text-xs leading-relaxed">
+            Focus. Track. Grow.
+            Turn deep focus into measurable progress.
+          </p>
+        </div>
+
+        <!-- Product Links -->
+        <div class="space-y-3">
+          <h4 class="text-slate-200 font-semibold text-sm">Product</h4>
+          <ul class="space-y-2 text-slate-400">
+            <li><a href="#features" class="hover:text-blue-400 transition">Features</a></li>
+            <li><a href="#pricing" class="hover:text-blue-400 transition">Pricing</a></li>
+            <li><a href="login.html" class="hover:text-blue-400 transition">Dashboard</a></li>
+          </ul>
+        </div>
+
+        <!-- Company -->
+        <div class="space-y-3">
+          <h4 class="text-slate-200 font-semibold text-sm">Company</h4>
+          <ul class="space-y-2 text-slate-400">
+            <li><a href="#" class="hover:text-blue-400 transition">About</a></li>
+            <li><a href="#" class="hover:text-blue-400 transition">Careers</a></li>
+            <li><a href="#" class="hover:text-blue-400 transition">Contact</a></li>
+          </ul>
+        </div>
+
+        <!-- Stay Connected -->
+        <!-- Stay Connected -->
+        <div class="space-y-3">
+          <h4 class="text-slate-200 font-semibold text-sm">Stay Connected</h4>
+          <div class="flex gap-4 text-slate-400 text-lg">
+
+            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" class="hover:text-blue-400 transition" aria-label="Twitter">
+              <i class="fa-brands fa-x-twitter"></i>
+            </a>
+
+            <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" class="hover:text-blue-400 transition" aria-label="LinkedIn">
+              <i class="fa-brands fa-linkedin-in"></i>
+            </a>
+
+            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" class="hover:text-blue-400 transition" aria-label="Instagram">
+              <i class="fa-brands fa-instagram"></i>
+            </a>
+
+            <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" class="hover:text-blue-400 transition" aria-label="YouTube">
+              <i class="fa-brands fa-youtube"></i>
+            </a>
+
+          </div>
+        </div>
+
+      </div>
+
+      <div class="max-w-7xl mx-auto px-6 mt-10 flex flex-wrap items-center justify-between text-xs text-slate-500">
+        <p>© 2025 Grovity. All rights reserved.</p>
+        <div class="flex gap-4">
+          <a href="#" class="hover:text-blue-400 transition">Privacy</a>
+          <a href="#" class="hover:text-blue-400 transition">Terms</a>
+        </div>
+      </div>
+    </footer>
+
+
+  <script src="./src/js/sync.js"></script>
+  <script src="./src/js/index.js"></script>
+
+  <!-- Theme Toggle -->
+  <button onclick="toggleTheme()" class="theme-toggle" aria-label="Toggle theme">
+    <i id="themeIcon" class="fa-solid fa-sun"></i>
+  </button>
+
+  <script src="./theme-system.js"></script>
+</body>
+
+</html>
