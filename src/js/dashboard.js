@@ -300,10 +300,10 @@ function renderAchievements() {
     const totalStats = grovitySync.getTotalStats();
     
     const achievementData = {
-      totalTasks: totalStats.totalTasks || 0,
+      totalTasks: totalStats.totalTasksCompleted || 0,
       totalSessions: totalStats.totalSessions || 0,
       totalMinutes: totalStats.totalMinutes || 0,
-      currentStreak: stats.currentStreak || 0
+      currentStreak: stats.streak || 0
     };
     
     const achievementsHTML = achievementDefinitions.map(achievement => {
@@ -484,9 +484,10 @@ if (notesArea && charCount && saveNotesBtn && clearNotesBtn) {
     charCount.textContent = count + ' character' + (count !== 1 ? 's' : '');
   }
 
-  // Update character count as user types
+  // Update character count and auto-save as user types
   notesArea.addEventListener('input', function() {
     updateCharCount();
+    localStorage.setItem(NOTES_KEY, notesArea.value);
   });
 
   // Save notes when save button is clicked

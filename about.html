@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About – Grovity</title>
+  <link rel="stylesheet" href="./dist/output.css" />
+  <link rel="stylesheet" href="./theme-system.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+
+<body class="bg-slate-950 text-slate-100 leading-relaxed md:text-[16px] lg:text-[17px]">
+
+  <!-- NAVBAR -->
+  <nav class="bg-slate-950/80 backdrop-blur border-b border-slate-800 px-3 sm:px-6 py-3">
+    <div class="flex items-center justify-between px-2 sm:px-4 md:px-10 w-full relative">
+      <a href="index.html" class="text-xl sm:text-2xl font-bold tracking-tight text-blue-400">Grovity</a>
+
+      <ul class="hidden lg:flex gap-10 text-sm font-medium text-slate-200 absolute left-1/2 -translate-x-1/2">
+        <li><a href="index.html" class="hover:text-blue-400 transition">Home</a></li>
+        <li><a href="index.html#pricing" class="hover:text-blue-400 transition">Pricing</a></li>
+        <li><a href="about.html" class="text-blue-400 font-semibold">About</a></li>
+        <li><a href="workspace.html" class="hover:text-blue-400 transition">Workspace</a></li>
+      </ul>
+
+      <div class="hidden lg:flex items-center gap-4 text-sm">
+        <select class="border border-slate-700 bg-slate-900 text-slate-200 rounded px-2 py-1 text-xs">
+          <option>EN</option>
+          <option>HI</option>
+        </select>
+        <a href="login.html" class="text-slate-200 hover:text-blue-400 font-medium transition">Login</a>
+        <button onclick="location.href='signup.html'"
+          class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 active:bg-blue-700 font-medium text-sm transition">
+          Sign Up
+        </button>
+      </div>
+
+      <button id="menuBtn" class="lg:hidden p-2 border border-slate-700 rounded text-slate-200">
+        ☰
+      </button>
+    </div>
+  </nav>
+
+  <div id="overlay" class="hidden fixed inset-0 bg-black/60 z-30"></div>
+
+  <aside id="sidebar"
+    class="fixed top-0 right-0 h-full w-64 bg-slate-900 shadow-lg z-40 transform translate-x-full transition-transform duration-300 flex flex-col gap-6 p-6 text-slate-100 lg:hidden">
+    <button id="closeBtn" class="self-end text-2xl font-bold leading-none">×</button>
+    <a href="index.html" class="hover:text-blue-400 text-sm font-medium">Home</a>
+    <a href="index.html#pricing" class="hover:text-blue-400 text-sm font-medium">Pricing</a>
+    <a href="about.html" class="text-blue-400 font-semibold text-sm">About</a>
+    <a href="workspace.html" class="hover:text-blue-400 text-sm font-medium">Workspace</a>
+    <hr class="border-slate-700" />
+    <select class="border border-slate-700 bg-slate-950 text-slate-200 rounded px-2 py-1 text-xs">
+      <option>EN</option>
+      <option>HI</option>
+    </select>
+    <a href="login.html" class="hover:text-blue-400 text-sm font-medium">Login</a>
+    <button onclick="location.href='signup.html'"
+      class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 active:bg-blue-700 font-medium text-sm transition">
+      Sign Up
+    </button>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="max-w-6xl mx-auto px-4 sm:px-6">
+
+    <!-- Hero -->
+    <div class="text-center py-14 md:py-20">
+      <span class="inline-block px-3 py-1 rounded-full text-xs bg-blue-500/20 text-blue-300 border border-blue-500/40 mb-5 font-medium tracking-wide uppercase">
+        Our Story
+      </span>
+      <h1 class="text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-5 leading-tight">
+        Building tools for <span class="text-blue-400">deep focus</span>
+      </h1>
+      <p class="text-slate-400 max-w-2xl mx-auto text-sm sm:text-base leading-relaxed">
+        We believe everyone deserves a tool that turns scattered effort into real, measurable progress.
+      </p>
+    </div>
+
+    <!-- Mission -->
+    <section class="grid md:grid-cols-2 gap-8 md:gap-12 items-start mb-20 md:mb-28">
+      <div>
+        <h2 class="text-2xl sm:text-3xl font-bold text-white mb-5">Our Mission</h2>
+        <p class="text-slate-400 mb-4 leading-relaxed text-sm sm:text-base">
+          In a world full of distractions, we believe everyone deserves a tool that helps them focus on what truly
+          matters. Grovity is designed to make deep work feel natural and rewarding.
+        </p>
+        <p class="text-slate-400 leading-relaxed text-sm sm:text-base mb-6">
+          We combine psychology, productivity science, and thoughtful design to create an experience that respects
+          your time and amplifies your efforts.
+        </p>
+        <ul class="space-y-3">
+          <li class="flex items-center gap-3 text-sm text-slate-300">
+            <i class="fa-solid fa-check text-emerald-400 text-xs"></i>
+            Built on proven productivity science
+          </li>
+          <li class="flex items-center gap-3 text-sm text-slate-300">
+            <i class="fa-solid fa-check text-emerald-400 text-xs"></i>
+            Designed around deep work, not distractions
+          </li>
+          <li class="flex items-center gap-3 text-sm text-slate-300">
+            <i class="fa-solid fa-check text-emerald-400 text-xs"></i>
+            Continuously shaped by our community
+          </li>
+        </ul>
+      </div>
+
+      <div class="rounded-2xl border border-slate-800 bg-slate-900/60 p-6 space-y-5">
+        <div class="flex items-start gap-4">
+          <div class="w-10 h-10 rounded-lg bg-blue-500/20 border border-blue-500/30 flex items-center justify-center shrink-0">
+            <i class="fa-solid fa-bullseye text-blue-400"></i>
+          </div>
+          <div>
+            <p class="text-white font-semibold text-sm mb-1">Purpose-Driven Design</p>
+            <p class="text-slate-400 text-xs leading-relaxed">Every feature exists to help you go deeper into your work.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-4">
+          <div class="w-10 h-10 rounded-lg bg-purple-500/20 border border-purple-500/30 flex items-center justify-center shrink-0">
+            <i class="fa-solid fa-brain text-purple-400"></i>
+          </div>
+          <div>
+            <p class="text-white font-semibold text-sm mb-1">Science-Backed Methods</p>
+            <p class="text-slate-400 text-xs leading-relaxed">Pomodoro, time-blocking, and habit loops built in by default.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-4">
+          <div class="w-10 h-10 rounded-lg bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center shrink-0">
+            <i class="fa-solid fa-chart-line text-emerald-400"></i>
+          </div>
+          <div>
+            <p class="text-white font-semibold text-sm mb-1">Measurable Progress</p>
+            <p class="text-slate-400 text-xs leading-relaxed">Track streaks, session history, and task completion in real time.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-4">
+          <div class="w-10 h-10 rounded-lg bg-yellow-500/20 border border-yellow-500/30 flex items-center justify-center shrink-0">
+            <i class="fa-solid fa-users text-yellow-400"></i>
+          </div>
+          <div>
+            <p class="text-white font-semibold text-sm mb-1">Community-Shaped</p>
+            <p class="text-slate-400 text-xs leading-relaxed">Our users guide what we build next — always.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Values -->
+    <section class="mb-20 md:mb-28">
+      <div class="text-center mb-10">
+        <p class="text-xs font-semibold tracking-[0.2em] text-purple-400 uppercase mb-3">What We Stand For</p>
+        <h2 class="text-2xl sm:text-3xl font-bold text-white">Our Values</h2>
+      </div>
+      <div class="grid md:grid-cols-3 gap-4 sm:gap-6">
+        <div class="rounded-xl sm:rounded-2xl border border-slate-800 bg-slate-900/60 p-5 sm:p-6 hover:border-purple-500/50 transition">
+          <div class="w-10 h-10 rounded-lg bg-purple-500/20 flex items-center justify-center mb-4">
+            <i class="fa-solid fa-heart text-purple-400"></i>
+          </div>
+          <h3 class="font-semibold text-white mb-2">User First</h3>
+          <p class="text-slate-400 text-sm leading-relaxed">Every decision we make prioritizes your success and well-being.</p>
+        </div>
+        <div class="rounded-xl sm:rounded-2xl border border-slate-800 bg-slate-900/60 p-5 sm:p-6 hover:border-purple-500/50 transition">
+          <div class="w-10 h-10 rounded-lg bg-yellow-500/20 flex items-center justify-center mb-4">
+            <i class="fa-solid fa-lightbulb text-yellow-400"></i>
+          </div>
+          <h3 class="font-semibold text-white mb-2">Innovation</h3>
+          <p class="text-slate-400 text-sm leading-relaxed">We continuously improve and adapt based on science and user feedback.</p>
+        </div>
+        <div class="rounded-xl sm:rounded-2xl border border-slate-800 bg-slate-900/60 p-5 sm:p-6 hover:border-purple-500/50 transition">
+          <div class="w-10 h-10 rounded-lg bg-green-500/20 flex items-center justify-center mb-4">
+            <i class="fa-solid fa-handshake text-green-400"></i>
+          </div>
+          <h3 class="font-semibold text-white mb-2">Community</h3>
+          <p class="text-slate-400 text-sm leading-relaxed">We build with our users, not for them. Your voice shapes Grovity.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Stats -->
+    <section class="rounded-xl sm:rounded-2xl border border-slate-800 bg-slate-900/60 p-8 md:p-12 mb-20">
+      <div class="text-center mb-10">
+        <p class="text-xs font-semibold tracking-[0.2em] text-blue-400 uppercase mb-3">Impact</p>
+        <h2 class="text-2xl sm:text-3xl font-bold text-white">By The Numbers</h2>
+      </div>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+        <div>
+          <p class="text-3xl sm:text-4xl font-bold text-blue-400">50K+</p>
+          <p class="text-slate-400 text-sm mt-2">Active Users</p>
+        </div>
+        <div>
+          <p class="text-3xl sm:text-4xl font-bold text-purple-400">1M+</p>
+          <p class="text-slate-400 text-sm mt-2">Hours Tracked</p>
+        </div>
+        <div>
+          <p class="text-3xl sm:text-4xl font-bold text-emerald-400">99%</p>
+          <p class="text-slate-400 text-sm mt-2">User Satisfaction</p>
+        </div>
+        <div>
+          <p class="text-3xl sm:text-4xl font-bold text-yellow-400">24/7</p>
+          <p class="text-slate-400 text-sm mt-2">Support</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="mt-20 border-t border-slate-800 pt-10 pb-6">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 grid gap-6 sm:gap-10 grid-cols-2 md:grid-cols-4 text-xs sm:text-sm">
+      <div class="space-y-3">
+        <h3 class="text-xl font-bold text-blue-400 tracking-tight">Grovity</h3>
+        <p class="text-slate-400 text-xs leading-relaxed">Focus. Track. Grow. Turn deep focus into measurable progress.</p>
+      </div>
+      <div class="space-y-3">
+        <h4 class="text-slate-200 font-semibold text-sm">Product</h4>
+        <ul class="space-y-2 text-slate-400">
+          <li><a href="index.html#features" class="hover:text-blue-400 transition">Features</a></li>
+          <li><a href="index.html#pricing" class="hover:text-blue-400 transition">Pricing</a></li>
+          <li><a href="login.html" class="hover:text-blue-400 transition">Dashboard</a></li>
+        </ul>
+      </div>
+      <div class="space-y-3">
+        <h4 class="text-slate-200 font-semibold text-sm">Company</h4>
+        <ul class="space-y-2 text-slate-400">
+          <li><a href="about.html" class="hover:text-blue-400 transition">About</a></li>
+          <li><a href="careers.html" class="hover:text-blue-400 transition">Careers</a></li>
+          <li><a href="contact.html" class="hover:text-blue-400 transition">Contact</a></li>
+        </ul>
+      </div>
+      <div class="space-y-3">
+        <h4 class="text-slate-200 font-semibold text-sm">Stay Connected</h4>
+        <div class="flex gap-4 text-slate-400 text-lg">
+          <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" class="hover:text-blue-400 transition"><i class="fa-brands fa-x-twitter"></i></a>
+          <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" class="hover:text-blue-400 transition"><i class="fa-brands fa-linkedin-in"></i></a>
+          <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" class="hover:text-blue-400 transition"><i class="fa-brands fa-instagram"></i></a>
+          <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" class="hover:text-blue-400 transition"><i class="fa-brands fa-youtube"></i></a>
+        </div>
+      </div>
+    </div>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 mt-10 flex flex-wrap items-center justify-between text-xs text-slate-500">
+      <p>© 2025 Grovity. All rights reserved.</p>
+      <div class="flex gap-4">
+        <a href="#" class="hover:text-blue-400 transition">Privacy</a>
+        <a href="#" class="hover:text-blue-400 transition">Terms</a>
+      </div>
+    </div>
+  </footer>
+
+  <button onclick="toggleTheme()" class="theme-toggle" aria-label="Toggle theme">
+    <i id="themeIcon" class="fa-solid fa-sun"></i>
+  </button>
+
+  <script src="./theme-system.js"></script>
+  <script>
+    const menuBtn = document.getElementById('menuBtn');
+    const closeBtn = document.getElementById('closeBtn');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+    function openMenu() {
+      sidebar.classList.remove('hidden');
+      overlay.classList.remove('hidden');
+      sidebar.classList.remove('translate-x-full');
+    }
+    function closeMenu() {
+      sidebar.classList.add('translate-x-full');
+      setTimeout(() => sidebar.classList.add('hidden'), 300);
+      overlay.classList.add('hidden');
+    }
+    menuBtn.addEventListener('click', openMenu);
+    closeBtn.addEventListener('click', closeMenu);
+    overlay.addEventListener('click', closeMenu);
+  </script>
+
+</body>
+</html>
