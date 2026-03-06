@@ -8,6 +8,10 @@
   <link rel="stylesheet" href="./dist/output.css" />
   <link rel="stylesheet" href="./theme-system.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <!-- Firebase Compat SDK -->
+  <script src="https://www.gstatic.com/firebasejs/11.0.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/11.0.0/firebase-auth-compat.js"></script>
+  <script src="./src/js/firebase-init.js"></script>
 </head>
 
 <body class="bg-slate-950 text-slate-100 leading-relaxed md:text-[16px] lg:text-[17px]">
@@ -510,6 +514,26 @@
       </div>
     </footer>
 
+
+  <!-- Sync Firebase auth state with localStorage on home page -->
+  <script>
+    window.__fbAuth.onAuthStateChanged(function(user) {
+      if (user) {
+        var stored = JSON.parse(localStorage.getItem('grovity_user') || '{}');
+        if (!stored.uid) {
+          localStorage.setItem('grovity_user', JSON.stringify({
+            name: user.displayName || user.email.split('@')[0],
+            email: user.email,
+            photo: user.photoURL || '',
+            uid: user.uid
+          }));
+        }
+      } else {
+        // Firebase says not logged in — clear stale localStorage user
+        localStorage.removeItem('grovity_user');
+      }
+    });
+  </script>
 
   <script src="./src/js/sync.js"></script>
   <script src="./src/js/index.js"></script>

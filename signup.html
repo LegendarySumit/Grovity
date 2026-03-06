@@ -10,6 +10,10 @@
     rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
   />
+  <!-- Firebase Compat SDK -->
+  <script src="https://www.gstatic.com/firebasejs/11.0.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/11.0.0/firebase-auth-compat.js"></script>
+  <script src="./src/js/firebase-init.js"></script>
 </head>
 <body class="bg-slate-950 text-slate-100 flex min-h-screen flex-col">
 
@@ -101,7 +105,10 @@
           Sign up
         </button>
 
+        <div id="authError" class="hidden rounded-lg bg-red-500/10 border border-red-500/30 px-3 py-2 text-xs text-red-400"></div>
+
         <button
+          id="googleSignupBtn"
           type="button"
           class="w-full py-2.5 rounded-lg border border-slate-700 text-slate-200 text-sm font-medium hover:border-purple-400 hover:text-purple-300 transition flex items-center justify-center gap-2"
         >
@@ -113,43 +120,74 @@
   </main>
 
   <script>
-    // Handle form submission
+    // Redirect already-logged-in users
+    window.__fbAuth.onAuthStateChanged(function(user) {
+      if (user) {
+        var redirectTo = localStorage.getItem('grovity_redirect_after_login');
+        localStorage.removeItem('grovity_redirect_after_login');
+        window.location.href = redirectTo || 'workspace.html';
+      }
+    });
+
+    function _postSignupRedirect(user) {
+      localStorage.setItem('grovity_user', JSON.stringify({
+        name: user.displayName || user.email.split('@')[0],
+        email: user.email,
+        photo: user.photoURL || '',
+        uid: user.uid
+      }));
+      var selectedPlan = localStorage.getItem('grovity_selected_plan');
+      if (selectedPlan) {
+        localStorage.setItem('grovity_plan', selectedPlan);
+        localStorage.removeItem('grovity_selected_plan');
+      }
+      var redirectTo = localStorage.getItem('grovity_redirect_after_login');
+      localStorage.removeItem('grovity_redirect_after_login');
+      window.location.href = redirectTo || 'workspace.html';
+    }
+
+    function _showError(msg) {
+      var el = document.getElementById('authError');
+      el.textContent = msg;
+      el.classList.remove('hidden');
+    }
+
+    // Email / password sign-up
     document.querySelector('form').addEventListener('submit', function(e) {
       e.preventDefault();
-      
-      // Get form values
-      const name = document.getElementById('name').value;
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
-      const confirm = document.getElementById('confirm').value;
-      
-      // Basic validation
-      if (password !== confirm) {
-        alert('Passwords do not match!');
-        return;
-      }
-      
-      if (name && email && password) {
-        // Save user data
-        localStorage.setItem('grovity_user', JSON.stringify({ email: email, name: name }));
-        
-        // Check if there was a selected plan before signup
-        const selectedPlan = localStorage.getItem('grovity_selected_plan');
-        if (selectedPlan) {
-          localStorage.setItem('grovity_plan', selectedPlan);
-          localStorage.removeItem('grovity_selected_plan');
-        }
-        
-        // Check if there's a redirect destination
-        const redirectTo = localStorage.getItem('grovity_redirect_after_login');
-        localStorage.removeItem('grovity_redirect_after_login');
-        
-        if (redirectTo) {
-          window.location.href = redirectTo;
-        } else {
-          window.location.href = 'workspace.html';
-        }
-      }
+      document.getElementById('authError').classList.add('hidden');
+
+      var name     = document.getElementById('name').value.trim();
+      var email    = document.getElementById('email').value.trim();
+      var password = document.getElementById('password').value;
+      var confirm  = document.getElementById('confirm').value;
+
+      if (!name || !email || !password) return;
+      if (password !== confirm) { _showError('Passwords do not match.'); return; }
+      if (password.length < 6)  { _showError('Password must be at least 6 characters.'); return; }
+
+      window.__fbAuth.createUserWithEmailAndPassword(email, password)
+        .then(function(result) {
+          return result.user.updateProfile({ displayName: name }).then(function() {
+            return result.user;
+          });
+        })
+        .then(function(user) { _postSignupRedirect(user); })
+        .catch(function(err) {
+          var msg = 'Sign-up failed. Please try again.';
+          if (err.code === 'auth/email-already-in-use') msg = 'An account with this email already exists.';
+          else if (err.code === 'auth/invalid-email')  msg = 'Please enter a valid email address.';
+          else if (err.code === 'auth/weak-password')  msg = 'Password must be at least 6 characters.';
+          _showError(msg);
+        });
+    });
+
+    // Google sign-up
+    document.getElementById('googleSignupBtn').addEventListener('click', function() {
+      document.getElementById('authError').classList.add('hidden');
+      window.__fbAuth.signInWithPopup(window.__fbProvider)
+        .then(function(result) { _postSignupRedirect(result.user); })
+        .catch(function(err) { _showError(err.message); });
     });
   </script>
 

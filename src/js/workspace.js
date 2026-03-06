@@ -598,14 +598,17 @@ setInterval(() => {
 // Handle logout
 function handleLogout() {
   if (confirm('Are you sure you want to logout?')) {
-    // Clear user data but keep theme preference
-    const theme = localStorage.getItem('grovity_theme');
-    localStorage.clear();
-    if (theme) {
-      localStorage.setItem('grovity_theme', theme);
+    var theme = localStorage.getItem('grovity_theme');
+    var doLogout = function() {
+      localStorage.clear();
+      if (theme) localStorage.setItem('grovity_theme', theme);
+      window.location.href = 'index.html';
+    };
+    if (window.__fbSignOut) {
+      window.__fbSignOut().then(doLogout).catch(doLogout);
+    } else {
+      doLogout();
     }
-    // Redirect to home page
-    window.location.href = 'index.html';
   }
 }
 
