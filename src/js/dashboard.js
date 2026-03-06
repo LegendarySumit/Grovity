@@ -418,7 +418,7 @@ function renderAchievements() {
           
           <!-- Progress Bar -->
           <div class="relative h-1.5 bg-slate-800 rounded-full overflow-hidden mb-1">
-            <div class="absolute inset-0 bg-gradient-to-r from-emerald-500 to-green-400 transition-all duration-500" style="width: ${progressPercent}%"></div>
+            <div class="absolute inset-0 bg-linear-to-r from-emerald-500 to-green-400 transition-all duration-500" style="width: ${progressPercent}%"></div>
           </div>
           <p class="text-xs text-slate-500 text-right">${progressText}</p>
           
