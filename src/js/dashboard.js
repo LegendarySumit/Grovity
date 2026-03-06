@@ -194,15 +194,15 @@ function renderCalendar() {
   // Add days of month
   const today = new Date();
   for (let day = 1; day <= daysInMonth; day++) {
-    const dateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-    const dayData = dailySummary[dateKey] || { tasksCompleted: 0, sessionsCompleted: 0 };
+    const dateKey = new Date(year, month, day).toDateString();
+    const dayData = dailySummary[dateKey] || { tasksCompleted: 0, focusSessions: 0 };
     
     const isToday = today.getFullYear() === year && 
                    today.getMonth() === month && 
                    today.getDate() === day;
     
     // Determine activity level
-    const totalActivity = dayData.tasksCompleted + dayData.sessionsCompleted;
+    const totalActivity = dayData.tasksCompleted + dayData.focusSessions;
     let bgClass = 'bg-slate-800/50';
     if (totalActivity >= 10) bgClass = 'bg-emerald-500';
     else if (totalActivity >= 5) bgClass = 'bg-emerald-500/60';
@@ -212,7 +212,7 @@ function renderCalendar() {
     
     html += `
       <div class="aspect-square rounded-lg m-0.5 ${bgClass} ${borderClass} flex items-center justify-center text-[10px] font-medium transition-all hover:scale-105 hover:ring-2 hover:ring-slate-600 cursor-pointer"
-           title="${dateKey}: ${dayData.tasksCompleted} tasks, ${dayData.sessionsCompleted} sessions">
+           title="${dateKey}: ${dayData.tasksCompleted} tasks, ${dayData.focusSessions} sessions">
         <span class="text-slate-200">${day}</span>
       </div>
     `;
@@ -461,6 +461,8 @@ window.addEventListener('grovity-stats-update', () => {
 // Listen for real-time focus updates (same-tab sync)
 window.addEventListener('grovity-focus-update', () => {
   loadDashboard();
+  // Restart background timer if a new focus session just started
+  startDashboardBackgroundTimer();
 });
 
 // ===== NOTES SECTION FUNCTIONALITY =====
