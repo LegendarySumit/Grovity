@@ -3,8 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build": "npx @tailwindcss/cli -i ./src/input.css -o ./dist/output.css --minify",
-    "dev": "npx @tailwindcss/cli -i ./src/input.css -o ./dist/output.css --watch"
+    
   },
   "devDependencies": {
     "tailwindcss": "^4.1.17",
