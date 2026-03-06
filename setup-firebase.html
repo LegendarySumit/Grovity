@@ -1,0 +1,312 @@
+<!-- ============================================================
+     GROVITY — Firebase Setup Helper (Development Only)
+     
+     Use this page in development to configure Firebase credentials
+     Opens in: file:///path/to/grovity/setup-firebase.html
+     
+     Credentials are stored in browser localStorage (development only)
+     ============================================================ -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Firebase Setup – Grovity Development</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+        'Ubuntu', 'Cantarell', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: white;
+      border-radius: 8px;
+      padding: 40px;
+      max-width: 500px;
+      width: 100%;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    }
+
+    h1 {
+      color: #333;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    .subtitle {
+      color: #666;
+      font-size: 14px;
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      color: #333;
+      font-weight: 500;
+      font-size: 13px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+      font-family: monospace;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .help-text {
+      font-size: 12px;
+      color: #999;
+      margin-top: 4px;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 10px;
+      margin-top: 30px;
+    }
+
+    button {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      border-radius: 4px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+    }
+
+    .btn-save {
+      background: #667eea;
+      color: white;
+    }
+
+    .btn-save:hover {
+      background: #556dd6;
+    }
+
+    .btn-clear {
+      background: #f5f5f5;
+      color: #333;
+    }
+
+    .btn-clear:hover {
+      background: #e0e0e0;
+    }
+
+    .alert {
+      padding: 12px;
+      border-radius: 4px;
+      margin-bottom: 20px;
+      font-size: 13px;
+    }
+
+    .alert-success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    .alert-info {
+      background: #d1ecf1;
+      color: #0c5460;
+      border: 1px solid #bee5eb;
+    }
+
+    .alert-warning {
+      background: #fff3cd;
+      color: #856404;
+      border: 1px solid #ffeeba;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .status-saved {
+      color: #28a745;
+      font-weight: 600;
+    }
+
+    .status-unsaved {
+      color: #dc3545;
+      font-weight: 600;
+    }
+
+    code {
+      background: #f5f5f5;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-family: monospace;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔑 Firebase Setup</h1>
+    <p class="subtitle">Development Configuration (for local testing only)</p>
+
+    <div id="successAlert" class="alert alert-success hidden">
+      ✓ Credentials saved to localStorage
+    </div>
+
+    <div id="infoAlert" class="alert alert-info">
+      <strong>Info:</strong> These credentials are stored in your browser's localStorage for development only.
+      They are <strong>never</strong> committed to git or sent to any server.
+    </div>
+
+    <form id="setupForm">
+      <div class="form-group">
+        <label for="apiKey">Firebase API Key</label>
+        <input type="password" id="apiKey" placeholder="AIza..." required />
+        <p class="help-text">From: Firebase Console → Settings → API Key</p>
+      </div>
+
+      <div class="form-group">
+        <label for="authDomain">Auth Domain</label>
+        <input type="text" id="authDomain" placeholder="yourproject.firebaseapp.com" required />
+        <p class="help-text">Example: grovity-6082a.firebaseapp.com</p>
+      </div>
+
+      <div class="form-group">
+        <label for="projectId">Project ID</label>
+        <input type="text" id="projectId" placeholder="yourproject" required />
+        <p class="help-text">Your Firebase Project ID</p>
+      </div>
+
+      <div class="form-group">
+        <label for="storageBucket">Storage Bucket</label>
+        <input type="text" id="storageBucket" placeholder="yourproject.appspot.com" required />
+        <p class="help-text">Example: grovity-6082a.firebasestorage.app</p>
+      </div>
+
+      <div class="form-group">
+        <label for="messagingSenderId">Messaging Sender ID</label>
+        <input type="text" id="messagingSenderId" placeholder="395240545634" required />
+        <p class="help-text">From: Firebase Console → Settings → Sender ID</p>
+      </div>
+
+      <div class="form-group">
+        <label for="appId">App ID</label>
+        <input type="text" id="appId" placeholder="1:395240545634:web:..." required />
+        <p class="help-text">From: Firebase Console → Settings → App ID</p>
+      </div>
+
+      <div class="form-group">
+        <label for="measurementId">Measurement ID</label>
+        <input type="text" id="measurementId" placeholder="G-XXXXX" />
+        <p class="help-text">Optional: For Google Analytics</p>
+      </div>
+
+      <div class="button-group">
+        <button type="submit" class="btn-save">Save Credentials</button>
+        <button type="button" class="btn-clear" onclick="clearCredentials()">Clear All</button>
+      </div>
+    </form>
+
+    <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
+      <p style="color: #666; font-size: 13px; margin-bottom: 10px;">
+        <strong>Status:</strong> <span id="savedStatus" class="status-unsaved">Not saved</span>
+      </p>
+      <p style="color: #666; font-size: 12px; line-height: 1.6;">
+        After saving, go to: <code>index.html</code>, <code>login.html</code>, or other pages.
+        Your credentials will be automatically loaded.
+      </p>
+    </div>
+  </div>
+
+  <script>
+    // Load saved credentials on page load
+    function loadSavedCredentials() {
+      document.getElementById('apiKey').value = localStorage.getItem('fb_api_key') || '';
+      document.getElementById('authDomain').value = localStorage.getItem('fb_auth_domain') || '';
+      document.getElementById('projectId').value = localStorage.getItem('fb_project_id') || '';
+      document.getElementById('storageBucket').value = localStorage.getItem('fb_storage_bucket') || '';
+      document.getElementById('messagingSenderId').value = localStorage.getItem('fb_messaging_sender_id') || '';
+      document.getElementById('appId').value = localStorage.getItem('fb_app_id') || '';
+      document.getElementById('measurementId').value = localStorage.getItem('fb_measurement_id') || '';
+      
+      updateSavedStatus();
+    }
+
+    // Save credentials to localStorage
+    function saveCredentials(e) {
+      e.preventDefault();
+
+      localStorage.setItem('fb_api_key', document.getElementById('apiKey').value);
+      localStorage.setItem('fb_auth_domain', document.getElementById('authDomain').value);
+      localStorage.setItem('fb_project_id', document.getElementById('projectId').value);
+      localStorage.setItem('fb_storage_bucket', document.getElementById('storageBucket').value);
+      localStorage.setItem('fb_messaging_sender_id', document.getElementById('messagingSenderId').value);
+      localStorage.setItem('fb_app_id', document.getElementById('appId').value);
+      localStorage.setItem('fb_measurement_id', document.getElementById('measurementId').value);
+
+      // Show success message
+      const alert = document.getElementById('successAlert');
+      alert.classList.remove('hidden');
+      setTimeout(() => alert.classList.add('hidden'), 3000);
+      
+      updateSavedStatus();
+    }
+
+    function clearCredentials() {
+      if (confirm('Are you sure? This will clear all saved Firebase credentials.')) {
+        localStorage.removeItem('fb_api_key');
+        localStorage.removeItem('fb_auth_domain');
+        localStorage.removeItem('fb_project_id');
+        localStorage.removeItem('fb_storage_bucket');
+        localStorage.removeItem('fb_messaging_sender_id');
+        localStorage.removeItem('fb_app_id');
+        localStorage.removeItem('fb_measurement_id');
+        
+        document.getElementById('setupForm').reset();
+        updateSavedStatus();
+      }
+    }
+
+    function updateSavedStatus() {
+      const hasSavedCreds = localStorage.getItem('fb_api_key');
+      const statusEl = document.getElementById('savedStatus');
+      if (hasSavedCreds) {
+        statusEl.textContent = 'Saved ✓';
+        statusEl.className = 'status-saved';
+      } else {
+        statusEl.textContent = 'Not saved';
+        statusEl.className = 'status-unsaved';
+      }
+    }
+
+    // Initialize
+    document.getElementById('setupForm').addEventListener('submit', saveCredentials);
+    loadSavedCredentials();
+  </script>
+</body>
+</html>
