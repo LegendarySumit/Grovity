@@ -1,3 +1,7 @@
+function escapeHTML(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
 // Sidebar Navigation
 const menuBtn = document.getElementById('menuBtn');
 const closeBtn = document.getElementById('closeBtn');
@@ -146,7 +150,7 @@ function renderSessionHistory(sessions) {
             <i class="fa-solid fa-clock text-blue-400 text-sm"></i>
           </div>
           <div class="min-w-0 flex-1">
-            <p class="text-sm font-medium text-white truncate">${session.taskName}</p>
+            <p class="text-sm font-medium text-white truncate">${escapeHTML(session.taskName)}</p>
             <p class="text-xs text-slate-500">${timeLabel} • ${sessionDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</p>
           </div>
         </div>

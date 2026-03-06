@@ -4,6 +4,10 @@ const taskList = document.getElementById('taskList');
 const TASKS_KEY = "grovity_tasks";
 let tasks = [];
 
+function escapeHTML(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
 // HABIT TRACKER
 const HABITS_KEY = "grovity_habits";
 const HABIT_PROGRESS_KEY = "grovity_habit_progress";
@@ -51,7 +55,7 @@ function renderHabits() {
           data-habit-id="${habit.id}" 
           ${todayProgress[habit.id] ? 'checked' : ''}
           class="w-4 h-4 rounded border-slate-600 bg-slate-900 text-emerald-500 focus:ring-emerald-500 focus:ring-offset-slate-950" />
-        <span class="text-sm text-slate-200 flex-1">${habit.name}</span>
+        <span class="text-sm text-slate-200 flex-1">${escapeHTML(habit.name)}</span>
         <button class="text-slate-500 hover:text-red-400 text-xs" data-delete-good="${habit.id}">
           <i class="fa-solid fa-trash"></i>
         </button>
@@ -68,7 +72,7 @@ function renderHabits() {
           data-habit-id="${habit.id}" 
           ${todayProgress[habit.id] ? 'checked' : ''}
           class="w-4 h-4 rounded border-slate-600 bg-slate-900 text-red-500 focus:ring-red-500 focus:ring-offset-slate-950" />
-        <span class="text-sm text-slate-200 flex-1">${habit.name}</span>
+        <span class="text-sm text-slate-200 flex-1">${escapeHTML(habit.name)}</span>
         <button class="text-slate-500 hover:text-red-400 text-xs" data-delete-bad="${habit.id}">
           <i class="fa-solid fa-trash"></i>
         </button>
@@ -206,7 +210,7 @@ function renderTasks() {
     li.innerHTML = `
       <label class="flex items-center gap-2 flex-1 cursor-pointer" title="Set as current focus task">
         <input type="checkbox" data-id="${task.id}" class="h-4 w-4 rounded border-slate-600 bg-slate-950 text-blue-500 focus:ring-blue-500" ${isCurrentFocus ? "checked" : ""}/>
-        <span class="text-xs md:text-sm text-slate-200 ${isCurrentFocus ? 'font-semibold' : ''}">${task.text}${isCurrentFocus ? ' 🎯' : ''}</span>
+        <span class="text-xs md:text-sm text-slate-200 ${isCurrentFocus ? 'font-semibold' : ''}">${escapeHTML(task.text)}${isCurrentFocus ? ' 🎯' : ''}</span>
       </label>
       <button class="text-[11px] text-slate-500 hover:text-red-400" data-del="${task.id}">Delete</button>`;
     taskList.appendChild(li);
