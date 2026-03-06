@@ -1,5 +1,5 @@
-# Build output
-dist/
+# Build output — committed for Vercel deployment
+# dist/
 
 # Node
 node_modules/
