@@ -1,6 +1,3 @@
-# Firebase config (contains API keys — never commit)
-src/js/firebase-init.js
-
 # Build output
 dist/
 
