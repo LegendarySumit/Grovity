@@ -21,32 +21,24 @@ async function initializeUserData() {
     window.__fbAuth.onAuthStateChanged(async (user) => {
       if (user) {
         currentUserId = user.uid;
-        console.log('✅ User authenticated:', currentUserId);
-        console.log('✅ User email:', user.email);
-        console.log('✅ Firestore DB available:', !!window.__grovityDB);
         
         // Load data from Firestore
-        console.log('📥 Loading tasks from Firestore...');
         await loadTasksFromFirestore();
-        console.log('📥 Loading habits from Firestore...');
         await loadHabitsFromFirestore();
         
         // Setup real-time listeners
         window.__grovityDB.onTasksChange(currentUserId, (updatedTasks) => {
-          console.log('🔄 Tasks updated from Firestore:', updatedTasks);
           tasks = updatedTasks;
           renderTasks();
         });
         
         window.__grovityDB.onHabitsChange(currentUserId, (updatedHabits) => {
-          console.log('🔄 Habits updated from Firestore:', updatedHabits);
           habits = updatedHabits;
           renderHabits();
         });
         
         resolve();
       } else {
-        console.warn('⚠️ No user authenticated');
         resolve();
       }
     });
@@ -54,7 +46,6 @@ async function initializeUserData() {
 }
 
 // Initialize data when page loads
-console.log('🚀 Initializing Grovity workspace...');
 initializeUserData();
 
 // HABIT TRACKER
@@ -274,9 +265,6 @@ function addTask() {
   const text = taskInput.value.trim();
   if (!text) return;
   
-  console.log('➕ Adding task:', text);
-  console.log('➕ Current user ID:', currentUserId);
-  
   // If this is the first task, make it the current focus automatically
   const isFirstTask = tasks.length === 0;
   tasks.unshift({ 
@@ -285,14 +273,15 @@ function addTask() {
     isCurrentFocus: isFirstTask 
   });
   
-  console.log('💾 Saving to Firestore...');
   saveTasksToFirestore();
   renderTasks();
   taskInput.value = "";
   taskInput.focus();
   
   // Sync: Increment tasks created today and update current focus
-  grovitySync.incrementTasksCreatedToday();
+  if (typeof grovitySync !== 'undefined') {
+    grovitySync.incrementTasksCreatedToday();
+  }
   if (isFirstTask) {
     updateCurrentFocusTask();
   }
@@ -340,15 +329,17 @@ taskList.addEventListener("click", (e) => {
 
 // Update current focus task in sync
 function updateCurrentFocusTask() {
-  const currentTask = tasks.find(t => t.isCurrentFocus);
-  const currentFocusData = grovitySync.getCurrentFocus() || {};
-  
-  // Preserve timer state but update task name
-  grovitySync.updateCurrentFocus({
-    ...currentFocusData,
-    taskName: currentTask ? currentTask.text : 'No active task',
-    taskId: currentTask ? currentTask.id : null
-  });
+  if (typeof grovitySync !== 'undefined') {
+    const currentTask = tasks.find(t => t.isCurrentFocus);
+    const currentFocusData = grovitySync.getCurrentFocus() || {};
+    
+    // Preserve timer state but update task name
+    grovitySync.updateCurrentFocus({
+      ...currentFocusData,
+      taskName: currentTask ? currentTask.text : 'No active task',
+      taskId: currentTask ? currentTask.id : null
+    });
+  }
 }
 
 // Tasks are now loaded via initializeUserData()
@@ -374,39 +365,41 @@ let sessionStarted = false;
 
 // Restore timer state from localStorage
 function restoreTimerState() {
-  const focusData = grovitySync.getCurrentFocus();
-  if (focusData && focusData.totalMinutes) {
-    totalSeconds = focusData.totalMinutes * 60;
-    remainingSeconds = focusData.remainingSeconds || totalSeconds;
-    isRunning = focusData.isRunning || false;
-    sessionStarted = focusData.sessionStarted || false;
-    
-    // Update display immediately
-    updateDisplay();
-    
-    // Resume timer if it was running
-    if (isRunning && remainingSeconds > 0) {
-      startTimerBtn.textContent = 'Pause';
-      timerStatus.textContent = 'Timer running...';
+  if (typeof grovitySync !== 'undefined') {
+    const focusData = grovitySync.getCurrentFocus();
+    if (focusData && focusData.totalMinutes) {
+      totalSeconds = focusData.totalMinutes * 60;
+      remainingSeconds = focusData.remainingSeconds || totalSeconds;
+      isRunning = focusData.isRunning || false;
+      sessionStarted = focusData.sessionStarted || false;
       
-      // Clear any existing interval
-      if (timerInterval) {
-        clearInterval(timerInterval);
-      }
+      // Update display immediately
+      updateDisplay();
       
-      // Start the interval to continue countdown
-      timerInterval = setInterval(() => {
-        if (remainingSeconds > 0) {
-          remainingSeconds--;
-          updateDisplay();
-          syncCurrentFocus();
-        } else {
-          completeSession();
-          stopTimer();
-          timerStatus.textContent = 'Time\'s up! 🎉';
-          playNotification();
+      // Resume timer if it was running
+      if (isRunning && remainingSeconds > 0) {
+        startTimerBtn.textContent = 'Pause';
+        timerStatus.textContent = 'Timer running...';
+        
+        // Clear any existing interval
+        if (timerInterval) {
+          clearInterval(timerInterval);
         }
-      }, 1000);
+        
+        // Start the interval to continue countdown
+        timerInterval = setInterval(() => {
+          if (remainingSeconds > 0) {
+            remainingSeconds--;
+            updateDisplay();
+            syncCurrentFocus();
+          } else {
+            completeSession();
+            stopTimer();
+            timerStatus.textContent = 'Time\'s up! 🎉';
+            playNotification();
+          }
+        }, 1000);
+      }
     }
   }
 }
@@ -441,7 +434,7 @@ function startTimer() {
   timerStatus.textContent = 'Timer running...';
   
   // Sync: Update current focus and count session only on first start
-  if (!sessionStarted) {
+  if (!sessionStarted && typeof grovitySync !== 'undefined') {
     grovitySync.incrementFocusSessionsToday();
     sessionStarted = true;
   }
@@ -484,7 +477,7 @@ function stopTimer() {
 
 function completeSession() {
   const completedMinutes = Math.floor((totalSeconds - remainingSeconds) / 60);
-  if (completedMinutes > 0) {
+  if (completedMinutes > 0 && typeof grovitySync !== 'undefined') {
     const currentTask = tasks.find(t => t.isCurrentFocus);
     const taskName = currentTask ? currentTask.text : 'Focus Session';
     grovitySync.addSessionToHistory({
@@ -584,16 +577,18 @@ if ('Notification' in window && Notification.permission === 'default') {
 
 // Sync current focus to localStorage
 function syncCurrentFocus() {
-  const currentTask = tasks.find(t => t.isCurrentFocus);
-  grovitySync.updateCurrentFocus({
-    taskName: currentTask ? currentTask.text : 'No active task',
-    taskId: currentTask ? currentTask.id : null,
-    totalMinutes: Math.floor(totalSeconds / 60),
-    remainingSeconds: remainingSeconds,
-    isRunning: isRunning,
-    sessionStarted: sessionStarted,
-    timestamp: Date.now()
-  });
+  if (typeof grovitySync !== 'undefined') {
+    const currentTask = tasks.find(t => t.isCurrentFocus);
+    grovitySync.updateCurrentFocus({
+      taskName: currentTask ? currentTask.text : 'No active task',
+      taskId: currentTask ? currentTask.id : null,
+      totalMinutes: Math.floor(totalSeconds / 60),
+      remainingSeconds: remainingSeconds,
+      isRunning: isRunning,
+      sessionStarted: sessionStarted,
+      timestamp: Date.now()
+    });
+  }
 }
 
 // Initialize - restore state and update display
@@ -603,7 +598,7 @@ syncCurrentFocus();
 
 // Listen for storage changes from other tabs (e.g., homepage updating timer)
 window.addEventListener('storage', (e) => {
-  if (e.key === 'grovity_current_focus') {
+  if (e.key === 'grovity_current_focus' && typeof grovitySync !== 'undefined') {
     const focusData = grovitySync.getCurrentFocus();
     if (focusData && focusData.totalMinutes) {
       // Stop current interval to avoid conflicts
@@ -637,22 +632,26 @@ window.addEventListener('storage', (e) => {
 
 // Also listen for same-page custom events
 window.addEventListener('grovity-focus-update', () => {
-  const focusData = grovitySync.getCurrentFocus();
-  if (focusData) {
-    remainingSeconds = focusData.remainingSeconds || remainingSeconds;
-    updateDisplay();
+  if (typeof grovitySync !== 'undefined') {
+    const focusData = grovitySync.getCurrentFocus();
+    if (focusData) {
+      remainingSeconds = focusData.remainingSeconds || remainingSeconds;
+      updateDisplay();
+    }
   }
 });
 
 // Periodically check and sync with localStorage (every 2 seconds)
 setInterval(() => {
-  const focusData = grovitySync.getCurrentFocus();
-  if (focusData && focusData.remainingSeconds !== undefined) {
-    // Only update if there's a significant difference (more than 2 seconds)
-    const diff = Math.abs(remainingSeconds - focusData.remainingSeconds);
-    if (diff > 2) {
-      remainingSeconds = focusData.remainingSeconds;
-      updateDisplay();
+  if (typeof grovitySync !== 'undefined') {
+    const focusData = grovitySync.getCurrentFocus();
+    if (focusData && focusData.remainingSeconds !== undefined) {
+      // Only update if there's a significant difference (more than 2 seconds)
+      const diff = Math.abs(remainingSeconds - focusData.remainingSeconds);
+      if (diff > 2) {
+        remainingSeconds = focusData.remainingSeconds;
+        updateDisplay();
+      }
     }
   }
 }, 2000);

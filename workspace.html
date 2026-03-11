@@ -1,10 +1,11 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Grovity – Workspace</title>
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
   <link rel="stylesheet" href="./dist/output.css" />
   <link rel="stylesheet" href="./theme-system.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
@@ -85,7 +86,7 @@
         <button onclick="handleLogout()" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 font-medium">Logout</button>
       </div>
 
-      <button id="menuBtn" class="md:hidden p-2 border border-slate-700 rounded text-slate-200">☰</button>
+      <button id="menuBtn" class="md:hidden p-2 border border-slate-700 rounded text-slate-200">â˜°</button>
     </div>
   </nav>
 
@@ -95,7 +96,7 @@
   <aside id="sidebar"
     class="fixed top-0 right-0 h-full w-64 bg-slate-900 shadow-lg z-40 transform translate-x-full transition-transform duration-300 flex flex-col gap-6 p-6 text-slate-100 md:hidden">
 
-    <button id="closeBtn" class="self-end text-2xl font-bold leading-none">×</button>
+    <button id="closeBtn" class="self-end text-2xl font-bold leading-none">Ã—</button>
     <a href="index.html" class="hover:text-blue-400 text-sm font-medium">Home</a>
     <a href="index.html#pricing" class="hover:text-blue-400 text-sm font-medium">Pricing</a>
     <a href="workspace.html" class="text-blue-400 text-sm font-semibold">Workspace</a>
@@ -227,9 +228,9 @@
         
         <!-- Tree Growing Area -->
         <div class="flex-1 flex items-center justify-center">
-          <div class="relative w-full h-full bg-gradient-to-b from-slate-900 to-slate-950 rounded-xl overflow-hidden border border-slate-700/50">
+          <div class="relative w-full h-full bg-linear-to-b from-slate-900 to-slate-950 rounded-xl overflow-hidden border border-slate-700/50">
             <!-- Grassland -->
-            <div class="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-emerald-950/60 via-emerald-900/40 to-transparent"></div>
+            <div class="absolute bottom-0 left-0 right-0 h-8 bg-linear-to-t from-emerald-950/60 via-emerald-900/40 to-transparent"></div>
             <div class="absolute bottom-0 left-0 right-0 h-1.5 bg-emerald-950/80 border-t border-emerald-900/50"></div>
             
             <!-- Tree Container -->
@@ -381,7 +382,7 @@
 
   <!-- SCRIPTS -->
   <script src="./src/js/sync.js"></script>
-  <script src="./src/js/workspace.js"></script>
+  <script src="./src/js/workspace.js?v=7"></script>
 
   <!-- Theme Toggle -->
   <button onclick="toggleTheme()" class="theme-toggle" aria-label="Toggle theme">
@@ -390,4 +391,5 @@
 
   <script src="./theme-system.js"></script>
 </body>
+
 </html>

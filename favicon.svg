@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="growthGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1e40af;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Main growth plant design centered -->
+  <g transform="translate(32, 32)">
+    <!-- Soil/Base circle -->
+    <circle cx="0" cy="12" r="8" fill="#10b981" opacity="0.3"/>
+    
+    <!-- Main stem -->
+    <path d="M 0 12 Q -1 6 0 0" stroke="#3b82f6" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    
+    <!-- Left branch with leaves -->
+    <path d="M -2 4 L -10 -2" stroke="#3b82f6" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <ellipse cx="-12" cy="-4" rx="2.5" ry="3.5" fill="#10b981" transform="rotate(-35 -12 -4)"/>
+    
+    <!-- Right branch with leaves -->
+    <path d="M 2 4 L 10 -2" stroke="#3b82f6" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <ellipse cx="12" cy="-4" rx="2.5" ry="3.5" fill="#10b981" transform="rotate(35 12 -4)"/>
+    
+    <!-- Top leaves (3x) -->
+    <ellipse cx="-4" cy="-8" rx="2" ry="4" fill="#10b981" transform="rotate(-45 -4 -8)"/>
+    <ellipse cx="0" cy="-12" rx="2" ry="4" fill="#10b981" transform="rotate(0 0 -12)"/>
+    <ellipse cx="4" cy="-8" rx="2" ry="4" fill="#10b981" transform="rotate(45 4 -8)"/>
+    
+    <!-- Central top growth point -->
+    <circle cx="0" cy="-14" r="1.5" fill="#10b981"/>
+  </g>
+  
+  <!-- Border ring accent -->
+  <circle cx="32" cy="32" r="30" fill="none" stroke="#3b82f6" stroke-width="1.5" opacity="0.4"/>
+</svg>
