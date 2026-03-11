@@ -53,55 +53,111 @@ Grovity is a comprehensive productivity platform designed to help users stay foc
 - **Vanilla JavaScript** - No framework dependencies
 - **Font Awesome 6.5.0** - Icon library
 
+### Authentication & Backend
+- **Firebase Authentication** - Google OAuth sign-in
+- **Firebase Firestore** - Cloud-based NoSQL database
+- **Firebase Compat SDK v11.0.0** - Client-side Firebase integration
+
 ### Architecture
 - **Modular JavaScript** - Separated into logical modules:
+  - `config-loader.js` - Firebase configuration management
+  - `firebase-init-secure.js` - Firebase initialization
+  - `firestore-db.js` - Firestore API wrapper
   - `sync.js` - Global synchronization engine
   - `index.js` - Homepage and authentication
   - `workspace.js` - Task, habit, and timer management
   - `dashboard.js` - Analytics and statistics
   - `theme-system.js` - Light/dark mode handling
-- **Event-driven** - Custom events for real-time updates (`grovity-focus-update`, `grovity-stats-update`)
-- **LocalStorage API** - Client-side data persistence
+- **Event-driven** - Custom events for real-time updates
+- **Cloud-based** - All data persists in Firestore, synced across devices
 
 ### Data Management
-- `grovity_user` - User profile data
-- `grovity_plan` - Selected subscription plan
-- `grovity_tasks` - Task list with metadata
-- `grovity_current_focus` - Active timer session data
-- `grovity_stats` - User statistics and progress
-- `grovity_session_history` - Completed session records
-- `grovity_daily_summary` - Daily task summaries
-- `grovity_notes` - Dashboard notes
-- `grovity_theme` - Theme preference (light/dark)
+- **Firestore Collections:**
+  - `users/{userId}/tasks/all-tasks` - Task list with metadata
+  - `users/{userId}/habits/all-habits` - Good habits and habits to avoid
+  - `users/{userId}/habit-progress/{date}` - Daily habit completion tracking
+  - `users/{userId}/notes/user-notes` - Dashboard notes
+- **LocalStorage (Fallback):**
+  - `grovity_theme` - Theme preference (light/dark)
+  - Local backup of tasks and notes for offline access
 
 ## File Structure
 
 ```
 Grovity/
-├── index.html              # Landing page & authentication
-├── login.html              # Login page
-├── signup.html             # Registration page
-├── workspace.html          # Main workspace (tasks, habits, timer)
-├── dashboard.html          # Analytics & statistics
-├── theme-system.css        # Theme variables and styling
-├── theme-system.js         # Theme toggle functionality
-├── package.json            # Project metadata
+├── index.html                 # Landing page & authentication
+├── login.html                 # Login page
+├── signup.html                # Registration page
+├── workspace.html             # Main workspace (tasks, habits, timer)
+├── dashboard.html             # Analytics & statistics
+├── theme-system.css           # Theme variables and styling
+├── theme-system.js            # Theme toggle functionality
+├── .env.local                 # Firebase credentials (local development)
+├── .env.local.example         # Example environment variables
+├── package.json               # Project metadata
 ├── src/
 │   ├── js/
-│   │   ├── sync.js         # Synchronization engine
-│   │   ├── index.js        # Homepage logic
-│   │   ├── workspace.js    # Workspace functionality
-│   │   └── dashboard.js    # Dashboard logic
-│   └── input.css           # Tailwind CSS input file
+│   │   ├── config-loader.js   # Firebase configuration
+│   │   ├── firebase-init-secure.js # Firebase initialization
+│   │   ├── firestore-db.js    # Firestore database service
+│   │   ├── sync.js            # Synchronization engine
+│   │   ├── index.js           # Homepage logic
+│   │   ├── workspace.js       # Workspace functionality
+│   │   └── dashboard.js       # Dashboard logic
+│   └── input.css              # Tailwind CSS input file
 └── dist/
-    └── output.css          # Compiled Tailwind CSS (generated)
+    └── output.css             # Compiled Tailwind CSS (generated)
 ```
 
 ## Installation & Setup
 
 ### Prerequisites
 - Modern web browser (Chrome, Firefox, Safari, Edge)
-- Local web server (optional, for development)
+- Local web server (for development)
+- Firebase project (for authentication and database)
+
+### Firebase Setup
+
+1. **Create Firebase Project**
+   - Go to [Firebase Console](https://console.firebase.google.com/)
+   - Create a new project or use existing project
+   - Enable Google OAuth in Authentication section
+
+2. **Enable Firestore Database**
+   - In Firebase Console → Build → Firestore Database
+   - Click "Create Database"
+   - Start in Test mode (temporary, update rules for production)
+
+3. **Set Firestore Security Rules**
+   ```javascript
+   rules_version = '2';
+   service cloud.firestore {
+     match /databases/{database}/documents {
+       match /users/{userId} {
+         allow read, write: if request.auth.uid == userId;
+         match /{document=**} {
+           allow read, write: if request.auth.uid == userId;
+         }
+       }
+       match /{document=**} {
+         allow read, write: if false;
+       }
+     }
+   }
+   ```
+
+4. **Get Firebase Credentials**
+   - Firebase Console → Project Settings
+   - Copy API Key, Auth Domain, Project ID, etc.
+   - Add to `src/js/config-loader.js`:
+   ```javascript
+   const firebaseConfig = {
+     'fb_api_key': 'YOUR_API_KEY',
+     'fb_auth_domain': 'YOUR_AUTH_DOMAIN',
+     'fb_project_id': 'YOUR_PROJECT_ID',
+     // ... other credentials
+   };
+   ```
 
 ### Quick Start
 
@@ -111,12 +167,16 @@ Grovity/
    cd Grovity
    ```
 
-2. **Open in browser**
+2. **Configure Firebase**
+   - Copy `.env.local.example` to `.env.local`
+   - Update `src/js/config-loader.js` with your Firebase credentials
+
+3. **Open in browser**
    - Simply open `index.html` in your browser
    - Or use a local server:
      ```bash
      # Using Python
-     python -m http.server 8000
+     python -m http.server 5000
      
      # Using Node.js (http-server)
      npx http-server
@@ -125,9 +185,9 @@ Grovity/
      Right-click index.html > Open with Live Server
      ```
 
-3. **Access the application**
-   - Navigate to `http://localhost:8000` (or appropriate port)
-   - Create an account or login
+4. **Access the application**
+   - Navigate to `http://localhost:5000` (or appropriate port)
+   - Click "Sign up with Google"
    - Start tracking your productivity!
 
 ### Building Tailwind CSS (Optional)
@@ -147,11 +207,17 @@ If you need to modify styles:
 ## Usage
 
 ### Getting Started
-1. **Sign Up** - Create an account with name, email, and password
-2. **Select Plan** - Choose between Starter, Pro, or Enterprise
+1. **Sign Up** - Create an account using Google OAuth
+2. **Grant Permissions** - Allow Grovity to access your Google account
 3. **Access Workspace** - Start adding tasks and building habits
 4. **Start Timer** - Focus on tasks with the built-in timer
 5. **Track Progress** - View analytics on the dashboard
+
+### Authentication
+- **Google OAuth** - Secure login with Google account
+- **Session Persistence** - Automatically login on return visits
+- **Automatic Sign-Out** - Logout clears session data safely
+- **Cross-Device Sync** - Same profile across all devices
 
 ### Key Workflows
 
@@ -212,27 +278,31 @@ If you need to modify styles:
 - Comprehensive color palette for both themes
 
 ### Data Persistence
-- All data stored in browser localStorage
-- Automatic save on every change
-- No server dependency
-- Privacy-focused (data never leaves the browser)
+- **Cloud Storage:** Primary data stored in Firebase Firestore (tasks, habits, notes)
+- **Real-time Sync:** Changes sync across all devices automatically
+- **Automatic Save:** Data saved instantly when created or modified
+- **Secure:** Google OAuth authentication, Firestore security rules
+- **Privacy:** Cloud-encrypted with user-specific data isolation
+- **Offline Support:** Local cache fallback to localStorage
 
 ## Limitations
 
-- **Local Storage Only** - Data is browser-specific (not synced across devices)
-- **Single User** - No multi-user support or cloud backup
-- **Browser Dependent** - Clearing browser data will erase all progress
-- **No Backend** - All processing happens client-side
+- **Single User** - Currently designed for individual productivity tracking
+- **Google Cloud** - Requires Firebase project and internet connection for sync
+- **Free Tier Limits** - Firebase free tier has daily read/write limits
+- **No Team Features** - Collaboration and multi-user support not yet implemented
 
 ## Future Enhancements (Potential)
 
-- Cloud synchronization across devices
+- ✅ ~~Cloud synchronization across devices~~ (Implemented with Firestore)
+- ✅ ~~Google OAuth authentication~~ (Implemented)
 - Data export/import functionality
 - Advanced analytics and insights
 - Team collaboration features
 - Mobile app versions
 - Integration with calendar apps
 - Pomodoro technique variations
+- Offline-first PWA support
 
 ## License
 
@@ -241,8 +311,9 @@ This project is proprietary. All rights reserved.
 ## Credits
 
 **Developer:** LegendarySumit 
-**Last Updated:** December 2025
+**Last Updated:** March 2026
 
 ---
 
 Built with ❤️ for productivity enthusiasts
+Powered by Firebase & Firestore

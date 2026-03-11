@@ -1,12 +1,61 @@
+// ============================================================
+//  GROVITY WORKSPACE — Task & Habit Management with Firestore
+// ============================================================
+
 const taskInput = document.getElementById('taskInput');
 const addTaskBtn = document.getElementById('addTaskBtn');
 const taskList = document.getElementById('taskList');
 const TASKS_KEY = "grovity_tasks";
 let tasks = [];
+let currentUserId = null;
 
 function escapeHTML(str) {
   return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
+
+// ============================================================
+// FIRESTORE INITIALIZATION - Wait for user authentication
+// ============================================================
+async function initializeUserData() {
+  return new Promise((resolve) => {
+    window.__fbAuth.onAuthStateChanged(async (user) => {
+      if (user) {
+        currentUserId = user.uid;
+        console.log('✅ User authenticated:', currentUserId);
+        console.log('✅ User email:', user.email);
+        console.log('✅ Firestore DB available:', !!window.__grovityDB);
+        
+        // Load data from Firestore
+        console.log('📥 Loading tasks from Firestore...');
+        await loadTasksFromFirestore();
+        console.log('📥 Loading habits from Firestore...');
+        await loadHabitsFromFirestore();
+        
+        // Setup real-time listeners
+        window.__grovityDB.onTasksChange(currentUserId, (updatedTasks) => {
+          console.log('🔄 Tasks updated from Firestore:', updatedTasks);
+          tasks = updatedTasks;
+          renderTasks();
+        });
+        
+        window.__grovityDB.onHabitsChange(currentUserId, (updatedHabits) => {
+          console.log('🔄 Habits updated from Firestore:', updatedHabits);
+          habits = updatedHabits;
+          renderHabits();
+        });
+        
+        resolve();
+      } else {
+        console.warn('⚠️ No user authenticated');
+        resolve();
+      }
+    });
+  });
+}
+
+// Initialize data when page loads
+console.log('🚀 Initializing Grovity workspace...');
+initializeUserData();
 
 // HABIT TRACKER
 const HABITS_KEY = "grovity_habits";
@@ -20,64 +69,63 @@ const addBadHabitBtn = document.getElementById('addBadHabitBtn');
 const goodHabitsList = document.getElementById('goodHabitsList');
 const badHabitsList = document.getElementById('badHabitsList');
 
-function loadHabits() {
-  habits = JSON.parse(localStorage.getItem(HABITS_KEY) || '{"good":[],"bad":[]}');
+async function loadHabitsFromFirestore() {
+  if (!currentUserId) return;
+  habits = await window.__grovityDB.loadHabits(currentUserId);
   renderHabits();
 }
 
-function saveHabits() {
-  localStorage.setItem(HABITS_KEY, JSON.stringify(habits));
+async function saveHabitsToFirestore() {
+  if (!currentUserId) return;
+  await window.__grovityDB.saveHabits(currentUserId, habits);
 }
 
-function getTodayProgress() {
-  const today = new Date().toDateString();
-  const allProgress = JSON.parse(localStorage.getItem(HABIT_PROGRESS_KEY) || '{}');
-  return allProgress[today] || {};
+async function getTodayProgress() {
+  if (!currentUserId) return {};
+  return await window.__grovityDB.loadHabitProgress(currentUserId);
 }
 
-function saveTodayProgress(progress) {
-  const today = new Date().toDateString();
-  const allProgress = JSON.parse(localStorage.getItem(HABIT_PROGRESS_KEY) || '{}');
-  allProgress[today] = progress;
-  localStorage.setItem(HABIT_PROGRESS_KEY, JSON.stringify(allProgress));
+async function saveTodayProgress(progress) {
+  if (!currentUserId) return;
+  await window.__grovityDB.saveHabitProgress(currentUserId, progress);
 }
 
 function renderHabits() {
-  const todayProgress = getTodayProgress();
-  
-  // Render Good Habits
-  goodHabitsList.innerHTML = habits.good.length === 0 
-    ? '<p class="text-xs text-slate-500">No good habits added yet</p>'
-    : habits.good.map(habit => `
-      <label class="flex items-center gap-3 p-2 rounded-lg border border-slate-800 bg-slate-950 hover:border-emerald-500/30 cursor-pointer transition">
-        <input type="checkbox" 
-          data-habit-type="good" 
-          data-habit-id="${habit.id}" 
-          ${todayProgress[habit.id] ? 'checked' : ''}
-          class="w-4 h-4 rounded border-slate-600 bg-slate-900 text-emerald-500 focus:ring-emerald-500 focus:ring-offset-slate-950" />
-        <span class="text-sm text-slate-200 flex-1">${escapeHTML(habit.name)}</span>
-        <button class="text-slate-500 hover:text-red-400 text-xs" data-delete-good="${habit.id}">
-          <i class="fa-solid fa-trash"></i>
-        </button>
-      </label>
-    `).join('');
-  
-  // Render Bad Habits
-  badHabitsList.innerHTML = habits.bad.length === 0
-    ? '<p class="text-xs text-slate-500">No habits to avoid added yet</p>'
-    : habits.bad.map(habit => `
-      <label class="flex items-center gap-3 p-2 rounded-lg border border-slate-800 bg-slate-950 hover:border-red-500/30 cursor-pointer transition">
-        <input type="checkbox" 
-          data-habit-type="bad" 
-          data-habit-id="${habit.id}" 
-          ${todayProgress[habit.id] ? 'checked' : ''}
-          class="w-4 h-4 rounded border-slate-600 bg-slate-900 text-red-500 focus:ring-red-500 focus:ring-offset-slate-950" />
-        <span class="text-sm text-slate-200 flex-1">${escapeHTML(habit.name)}</span>
-        <button class="text-slate-500 hover:text-red-400 text-xs" data-delete-bad="${habit.id}">
-          <i class="fa-solid fa-trash"></i>
-        </button>
-      </label>
-    `).join('');
+  getTodayProgress().then(todayProgress => {
+    // Render Good Habits
+    goodHabitsList.innerHTML = habits.good.length === 0 
+      ? '<p class="text-xs text-slate-500">No good habits added yet</p>'
+      : habits.good.map(habit => `
+        <label class="flex items-center gap-3 p-2 rounded-lg border border-slate-800 bg-slate-950 hover:border-emerald-500/30 cursor-pointer transition">
+          <input type="checkbox" 
+            data-habit-type="good" 
+            data-habit-id="${habit.id}" 
+            ${todayProgress[habit.id] ? 'checked' : ''}
+            class="w-4 h-4 rounded border-slate-600 bg-slate-900 text-emerald-500 focus:ring-emerald-500 focus:ring-offset-slate-950" />
+          <span class="text-sm text-slate-200 flex-1">${escapeHTML(habit.name)}</span>
+          <button class="text-slate-500 hover:text-red-400 text-xs" data-delete-good="${habit.id}">
+            <i class="fa-solid fa-trash"></i>
+          </button>
+        </label>
+      `).join('');
+    
+    // Render Bad Habits
+    badHabitsList.innerHTML = habits.bad.length === 0
+      ? '<p class="text-xs text-slate-500">No habits to avoid added yet</p>'
+      : habits.bad.map(habit => `
+        <label class="flex items-center gap-3 p-2 rounded-lg border border-slate-800 bg-slate-950 hover:border-red-500/30 cursor-pointer transition">
+          <input type="checkbox" 
+            data-habit-type="bad" 
+            data-habit-id="${habit.id}" 
+            ${todayProgress[habit.id] ? 'checked' : ''}
+            class="w-4 h-4 rounded border-slate-600 bg-slate-900 text-red-500 focus:ring-red-500 focus:ring-offset-slate-950" />
+          <span class="text-sm text-slate-200 flex-1">${escapeHTML(habit.name)}</span>
+          <button class="text-slate-500 hover:text-red-400 text-xs" data-delete-bad="${habit.id}">
+            <i class="fa-solid fa-trash"></i>
+          </button>
+        </label>
+      `).join('');
+  });
 }
 
 function addHabit(type) {
@@ -91,7 +139,7 @@ function addHabit(type) {
   };
   
   habits[type].push(habit);
-  saveHabits();
+  saveHabitsToFirestore();
   renderHabits();
   input.value = '';
 }
@@ -112,16 +160,17 @@ document.addEventListener('click', (e) => {
   // Handle habit checkbox
   if (e.target.dataset.habitId) {
     const habitId = e.target.dataset.habitId;
-    const todayProgress = getTodayProgress();
-    todayProgress[habitId] = e.target.checked;
-    saveTodayProgress(todayProgress);
+    getTodayProgress().then(todayProgress => {
+      todayProgress[habitId] = e.target.checked;
+      saveTodayProgress(todayProgress);
+    });
   }
   
   // Handle delete good habit
   if (e.target.closest('[data-delete-good]')) {
     const id = e.target.closest('[data-delete-good]').dataset.deleteGood;
     habits.good = habits.good.filter(h => h.id != id);
-    saveHabits();
+    saveHabitsToFirestore();
     renderHabits();
   }
   
@@ -129,12 +178,12 @@ document.addEventListener('click', (e) => {
   if (e.target.closest('[data-delete-bad]')) {
     const id = e.target.closest('[data-delete-bad]').dataset.deleteBad;
     habits.bad = habits.bad.filter(h => h.id != id);
-    saveHabits();
+    saveHabitsToFirestore();
     renderHabits();
   }
 });
 
-loadHabits();
+// Habits are now loaded via initializeUserData()
 
 // VISUAL GROWTH SYSTEM (Emoji-based)
 const treeGrowth = document.getElementById('treeGrowth');
@@ -186,12 +235,16 @@ function updateGrowth() {
   }
 }
 
-function loadTasks() {
-  tasks = JSON.parse(localStorage.getItem(TASKS_KEY) || "[]");
+async function loadTasksFromFirestore() {
+  if (!currentUserId) return;
+  tasks = await window.__grovityDB.loadTasks(currentUserId);
   renderTasks();
 }
 
-function saveTasks() { localStorage.setItem(TASKS_KEY, JSON.stringify(tasks)); }
+async function saveTasksToFirestore() {
+  if (!currentUserId) return;
+  await window.__grovityDB.saveTasks(currentUserId, tasks);
+}
 
 function renderTasks() {
   taskList.innerHTML = "";
@@ -221,6 +274,9 @@ function addTask() {
   const text = taskInput.value.trim();
   if (!text) return;
   
+  console.log('➕ Adding task:', text);
+  console.log('➕ Current user ID:', currentUserId);
+  
   // If this is the first task, make it the current focus automatically
   const isFirstTask = tasks.length === 0;
   tasks.unshift({ 
@@ -228,7 +284,9 @@ function addTask() {
     text, 
     isCurrentFocus: isFirstTask 
   });
-  saveTasks();
+  
+  console.log('💾 Saving to Firestore...');
+  saveTasksToFirestore();
   renderTasks();
   taskInput.value = "";
   taskInput.focus();
@@ -258,7 +316,7 @@ taskList.addEventListener("click", (e) => {
       isCurrentFocus: t.id == id ? !t.isCurrentFocus : false
     }));
     
-    saveTasks();
+    saveTasksToFirestore();
     renderTasks();
     updateCurrentFocusTask();
   }
@@ -274,7 +332,7 @@ taskList.addEventListener("click", (e) => {
       tasks[0].isCurrentFocus = true;
     }
     
-    saveTasks();
+    saveTasksToFirestore();
     renderTasks();
     updateCurrentFocusTask();
   }
@@ -293,7 +351,7 @@ function updateCurrentFocusTask() {
   });
 }
 
-loadTasks();
+// Tasks are now loaded via initializeUserData()
 
 // TIMER FUNCTIONALITY
 const timerDisplay = document.getElementById('timerDisplay');
@@ -374,7 +432,7 @@ function startTimer() {
   // If no task is marked as current focus, set the first task
   if (!tasks.find(t => t.isCurrentFocus) && tasks.length > 0) {
     tasks[0].isCurrentFocus = true;
-    saveTasks();
+    saveTasksToFirestore();
     renderTasks();
   }
   

@@ -3,6 +3,7 @@
 
 # Node
 node_modules/
+package-lock.json
 
 # Environment variables & secrets (NEVER commit these!)
 .env
@@ -12,7 +13,9 @@ node_modules/
 .env.production.local
 
 # Firebase configuration files
-# Old firebase-init.js with credentials should be in .gitignore (already configured)
+# config-loader.js contains API keys and should NOT be committed
+# Use config-loader.example.js as template, copy and fill in your own credentials
+src/js/config-loader.js
 src/js/firebase-init.js
 
 # IDE

@@ -7,25 +7,27 @@
 // ============================================================
 
 const firebaseConfig = {
-  apiKey:            "",
-  authDomain:        "grovity-6082a.firebaseapp.com",
-  projectId:         "grovity-6082a",
-  storageBucket:     "grovity-6082a.firebasestorage.app",
-  messagingSenderId: "395240545634",
-  appId:             "1:395240545634:web:838ce79996fb9683ad603b",
-  measurementId:     "G-P18QT7DTMQ"
+  apiKey:            window.__FB_API_KEY__,
+  authDomain:        window.__FB_AUTH_DOMAIN__,
+  projectId:         window.__FB_PROJECT_ID__,
+  storageBucket:     window.__FB_STORAGE_BUCKET__,
+  messagingSenderId: window.__FB_MESSAGING_SENDER_ID__,
+  appId:             window.__FB_APP_ID__,
+  measurementId:     window.__FB_MEASUREMENT_ID__
 };
 
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 
 const _fbAuth = firebase.auth();
+const _fbDb = firebase.firestore();
 
 // Persist session across tabs
 _fbAuth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
 
 // Global helpers used by all pages
 window.__fbAuth     = _fbAuth;
+window.__fbDb       = _fbDb;
 window.__fbProvider = new firebase.auth.GoogleAuthProvider();
 
 window.__fbSignOut = function () {

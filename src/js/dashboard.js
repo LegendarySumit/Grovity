@@ -2,6 +2,28 @@ function escapeHTML(str) {
   return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 
+// ============================================================
+// FIRESTORE INITIALIZATION - Get current user
+// ============================================================
+let currentUserId = null;
+
+async function initializeUserContext() {
+  return new Promise((resolve) => {
+    window.__fbAuth.onAuthStateChanged((user) => {
+      if (user) {
+        currentUserId = user.uid;
+        console.log('✅ Dashboard: User authenticated:', currentUserId);
+      } else {
+        console.warn('⚠️ Dashboard: No user authenticated');
+      }
+      resolve();
+    });
+  });
+}
+
+// Initialize user context when page loads
+initializeUserContext();
+
 // Sidebar Navigation
 const menuBtn = document.getElementById('menuBtn');
 const closeBtn = document.getElementById('closeBtn');
@@ -469,7 +491,7 @@ window.addEventListener('grovity-focus-update', () => {
   startDashboardBackgroundTimer();
 });
 
-// ===== NOTES SECTION FUNCTIONALITY =====
+// ===== NOTES SECTION FUNCTIONALITY (FIRESTORE) =====
 const NOTES_KEY = 'grovity_notes';
 const notesArea = document.getElementById('notesArea');
 const charCount = document.getElementById('charCount');
@@ -477,11 +499,29 @@ const saveNotesBtn = document.getElementById('saveNotes');
 const clearNotesBtn = document.getElementById('clearNotes');
 
 if (notesArea && charCount && saveNotesBtn && clearNotesBtn) {
-  // Load saved notes
-  function loadNotes() {
-    const savedNotes = localStorage.getItem(NOTES_KEY) || '';
-    notesArea.value = savedNotes;
-    updateCharCount();
+  // Load notes from Firestore
+  async function loadNotes() {
+    if (!currentUserId) {
+      console.warn('⚠️ Cannot load notes - no user ID');
+      return;
+    }
+    try {
+      console.log('📥 Loading notes from Firestore...');
+      const savedNotes = await window.__grovityDB.loadNote(currentUserId, 'user-notes') || '';
+      if (savedNotes && savedNotes.content) {
+        notesArea.value = savedNotes.content;
+      } else {
+        notesArea.value = '';
+      }
+      updateCharCount();
+      console.log('✅ Notes loaded from Firestore');
+    } catch (error) {
+      console.error('❌ Error loading notes:', error);
+      // Fallback to localStorage if Firestore fails
+      const fallbackNotes = localStorage.getItem(NOTES_KEY) || '';
+      notesArea.value = fallbackNotes;
+      updateCharCount();
+    }
   }
 
   // Update character count
@@ -490,15 +530,32 @@ if (notesArea && charCount && saveNotesBtn && clearNotesBtn) {
     charCount.textContent = count + ' character' + (count !== 1 ? 's' : '');
   }
 
+  // Save notes to both Firestore and localStorage
+  async function saveNotesToFirestore() {
+    if (!currentUserId) {
+      console.warn('⚠️ Cannot save notes - no user ID');
+      return;
+    }
+    try {
+      console.log('💾 Saving notes to Firestore...');
+      await window.__grovityDB.saveNote(currentUserId, 'user-notes', notesArea.value);
+      localStorage.setItem(NOTES_KEY, notesArea.value); // Fallback backup
+      console.log('✅ Notes saved to Firestore');
+    } catch (error) {
+      console.error('❌ Error saving notes:', error);
+      localStorage.setItem(NOTES_KEY, notesArea.value); // Fallback save
+    }
+  }
+
   // Update character count and auto-save as user types
   notesArea.addEventListener('input', function() {
     updateCharCount();
-    localStorage.setItem(NOTES_KEY, notesArea.value);
+    saveNotesToFirestore();
   });
 
   // Save notes when save button is clicked
   saveNotesBtn.addEventListener('click', function() {
-    localStorage.setItem(NOTES_KEY, notesArea.value);
+    saveNotesToFirestore();
     // Visual feedback - change icon color
     saveNotesBtn.style.color = '#10b981';
     setTimeout(function() {
@@ -510,13 +567,26 @@ if (notesArea && charCount && saveNotesBtn && clearNotesBtn) {
   clearNotesBtn.addEventListener('click', function() {
     if (confirm('Are you sure you want to clear all notes? This action cannot be undone.')) {
       notesArea.value = '';
-      localStorage.setItem(NOTES_KEY, '');
+      saveNotesToFirestore();
       updateCharCount();
     }
   });
 
-  // Load notes on page load
-  loadNotes();
+  // Load notes on page load (wait for user context to be available)
+  setTimeout(() => {
+    if (currentUserId) {
+      loadNotes();
+    } else {
+      console.log('⏳ Waiting for user authentication to load notes...');
+      // Retry after a short delay
+      const checkAuth = setInterval(() => {
+        if (currentUserId) {
+          clearInterval(checkAuth);
+          loadNotes();
+        }
+      }, 500);
+    }
+  }, 100);
 }
 
 // Background timer to keep countdown running when on dashboard page
