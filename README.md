@@ -13,10 +13,6 @@
 
 *Track tasks • Build habits • Manage time • Visualize growth*
 
-**Now with Firebase Cloud Sync & Google OAuth**
-
-**Implementation status:** P0 + P1 + P2 completed
-
 [Features](#-features) • [Quick Start](#-quick-start) • [Firebase Setup](#-firebase-setup) • [Tech Stack](#-tech-stack)
 
 </div>
@@ -28,14 +24,6 @@
 **Grovity** is a comprehensive productivity platform designed to help users **stay focused**, **track daily tasks**, **build positive habits**, and **monitor growth** through visual analytics.
 
 Features a clean, responsive interface with **light/dark mode support**, **real-time synchronization** across all pages, and **cloud-based data persistence** powered by **Firebase Firestore**.
-
----
-
-## 🏷️ Tags
-
-`productivity`, `pomodoro`, `task-manager`, `habit-tracker`, `firebase`, `firestore`, `app-check`, `vanilla-javascript`, `focus`, `web-app`
-
----
 
 ## ✅ Implementation Progress
 
