@@ -64,27 +64,6 @@ if (missingFields.length > 0) {
   // Initialize Firebase only when required config is present.
   firebase.initializeApp(firebaseConfig);
 
-  if (!appCheckSiteKey && !isLocalHost) {
-    showBootstrapError('Missing Firebase App Check site key on non-localhost host.');
-    throw new Error('Missing App Check site key for production host.');
-  }
-
-  if (firebase.appCheck && typeof firebase.appCheck === 'function' && appCheckSiteKey) {
-    const debugToken = (localStorage.getItem('grovity_appcheck_debug_token') || '').trim();
-    if (debugToken) {
-      self.FIREBASE_APPCHECK_DEBUG_TOKEN = debugToken;
-    }
-
-    const _fbAppCheck = firebase.appCheck();
-    _fbAppCheck.activate(appCheckSiteKey, true);
-    window.__fbAppCheck = _fbAppCheck;
-  } else if (!isLocalHost) {
-    showBootstrapError('Firebase App Check SDK missing or not initialized on non-localhost host.');
-    throw new Error('App Check SDK missing for production host.');
-  } else {
-    console.warn('App Check is not active. Local development fallback is enabled.');
-  }
-
   const _fbAuth = firebase.auth();
   const _fbDb = firebase.firestore();
 
@@ -99,4 +78,48 @@ if (missingFields.length > 0) {
   window.__fbSignOut = function () {
     return _fbAuth.signOut();
   };
+
+  function activateAppCheckSafely() {
+    if (!appCheckSiteKey && !isLocalHost) {
+      showBootstrapError('Missing Firebase App Check site key on non-localhost host.');
+      return;
+    }
+
+    if (!(firebase.appCheck && typeof firebase.appCheck === 'function')) {
+      if (!isLocalHost) {
+        showBootstrapError('Firebase App Check SDK missing or not initialized on non-localhost host.');
+      } else {
+        console.warn('App Check SDK is not available. Local development fallback is enabled.');
+      }
+      return;
+    }
+
+    if (!appCheckSiteKey) {
+      console.warn('App Check site key is empty. Local development fallback is enabled.');
+      return;
+    }
+
+    try {
+      const debugToken = (localStorage.getItem('grovity_appcheck_debug_token') || '').trim();
+      if (debugToken) {
+        self.FIREBASE_APPCHECK_DEBUG_TOKEN = debugToken;
+      }
+
+      const _fbAppCheck = firebase.appCheck();
+      _fbAppCheck.activate(appCheckSiteKey, true);
+      window.__fbAppCheck = _fbAppCheck;
+    } catch (error) {
+      console.error('Grovity App Check activation failed:', error);
+      if (!isLocalHost) {
+        showBootstrapError('Failed to initialize App Check on production host.');
+      }
+    }
+  }
+
+  // App Check injects reCAPTCHA elements; defer until the DOM is ready.
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', activateAppCheckSafely, { once: true });
+  } else {
+    activateAppCheckSafely();
+  }
 }
