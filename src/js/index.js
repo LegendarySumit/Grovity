@@ -1,7 +1,31 @@
-// Check if user is logged in - ONLY check for user data, NOT plan
+let authResolved = false;
+let firebaseAuthUser = null;
+
+if (window.__fbAuth && typeof window.__fbAuth.onAuthStateChanged === 'function') {
+  window.__fbAuth.onAuthStateChanged((user) => {
+    authResolved = true;
+    firebaseAuthUser = user || null;
+    updateNavButtons();
+  });
+}
+
+// Check if user is logged in
 function isUserLoggedIn() {
+  if (window.__grovityBootError) {
+    return false;
+  }
+
+  if (authResolved) {
+    return Boolean(firebaseAuthUser);
+  }
+
+  if (window.__fbAuth && typeof window.__fbAuth.onAuthStateChanged === 'function') {
+    // If Firebase auth is available but unresolved, prefer secure default.
+    return false;
+  }
+
   const user = JSON.parse(localStorage.getItem('grovity_user') || '{}');
-  // User is logged in ONLY if they have email/name
+  // Fallback for the initial auth hydration phase
   return user.email && user.email.length > 0;
 }
 

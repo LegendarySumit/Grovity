@@ -14,6 +14,7 @@ window.__FB_STORAGE_BUCKET__ = '${process.env.NEXT_PUBLIC_FB_STORAGE_BUCKET || '
 window.__FB_MESSAGING_SENDER_ID__ = '${process.env.NEXT_PUBLIC_FB_MESSAGING_SENDER_ID || ''}';
 window.__FB_APP_ID__ = '${process.env.NEXT_PUBLIC_FB_APP_ID || ''}';
 window.__FB_MEASUREMENT_ID__ = '${process.env.NEXT_PUBLIC_FB_MEASUREMENT_ID || ''}';
+window.__FB_APPCHECK_SITE_KEY__ = '${process.env.NEXT_PUBLIC_FB_APPCHECK_SITE_KEY || ''}';
 `;
 
 const configPath = path.join(__dirname, '../src/js/config-loader.js');

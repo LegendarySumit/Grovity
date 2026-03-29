@@ -232,6 +232,16 @@ http://localhost:5000
 4. Choose Firestore location
 
 ### 4. Set Firestore Security Rules
+Use the production rules file in this repo:
+
+- `firebase/firestore.rules`
+
+Deploy with Firebase CLI:
+
+```bash
+firebase deploy --only firestore:rules,storage:rules
+```
+
 ```javascript
 rules_version = '2';
 service cloud.firestore {
@@ -266,6 +276,17 @@ const firebaseConfig = {
   'fb_app_id': 'YOUR_APP_ID'
 };
 ```
+
+### 6. Configure Firebase App Check (required before public launch)
+
+1. Firebase Console → **Build** → **App Check**
+2. Register your web app with **reCAPTCHA v3**
+3. Copy the site key
+4. Set it in runtime config as `fb_appcheck_site_key`
+
+For full P0 launch hardening steps (domains, API restrictions, App Check enforcement), see:
+
+- `docs/security/firebase-p0-launch-checklist.md`
 
 ---
 

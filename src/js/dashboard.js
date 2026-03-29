@@ -9,12 +9,20 @@ let currentUserId = null;
 
 async function initializeUserContext() {
   return new Promise((resolve) => {
+    if (!window.__fbAuth || typeof window.__fbAuth.onAuthStateChanged !== 'function') {
+      console.error('Dashboard auth unavailable. Firebase bootstrap may have failed.');
+      resolve();
+      return;
+    }
+
     window.__fbAuth.onAuthStateChanged((user) => {
       if (user) {
         currentUserId = user.uid;
         console.log('✅ Dashboard: User authenticated:', currentUserId);
       } else {
         console.warn('⚠️ Dashboard: No user authenticated');
+        localStorage.setItem('grovity_redirect_after_login', 'dashboard.html');
+        window.location.href = 'login.html';
       }
       resolve();
     });

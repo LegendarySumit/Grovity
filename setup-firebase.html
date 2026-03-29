@@ -226,6 +226,12 @@
         <p class="help-text">Optional: For Google Analytics</p>
       </div>
 
+      <div class="form-group">
+        <label for="appCheckSiteKey">App Check Site Key</label>
+        <input type="text" id="appCheckSiteKey" placeholder="reCAPTCHA v3 site key" />
+        <p class="help-text">Required in production for Firebase App Check enforcement</p>
+      </div>
+
       <div class="button-group">
         <button type="submit" class="btn-save">Save Credentials</button>
         <button type="button" class="btn-clear" onclick="clearCredentials()">Clear All</button>
@@ -253,6 +259,7 @@
       document.getElementById('messagingSenderId').value = localStorage.getItem('fb_messaging_sender_id') || '';
       document.getElementById('appId').value = localStorage.getItem('fb_app_id') || '';
       document.getElementById('measurementId').value = localStorage.getItem('fb_measurement_id') || '';
+      document.getElementById('appCheckSiteKey').value = localStorage.getItem('fb_appcheck_site_key') || '';
       
       updateSavedStatus();
     }
@@ -268,6 +275,7 @@
       localStorage.setItem('fb_messaging_sender_id', document.getElementById('messagingSenderId').value);
       localStorage.setItem('fb_app_id', document.getElementById('appId').value);
       localStorage.setItem('fb_measurement_id', document.getElementById('measurementId').value);
+      localStorage.setItem('fb_appcheck_site_key', document.getElementById('appCheckSiteKey').value);
 
       // Show success message
       const alert = document.getElementById('successAlert');
@@ -286,6 +294,7 @@
         localStorage.removeItem('fb_messaging_sender_id');
         localStorage.removeItem('fb_app_id');
         localStorage.removeItem('fb_measurement_id');
+        localStorage.removeItem('fb_appcheck_site_key');
         
         document.getElementById('setupForm').reset();
         updateSavedStatus();

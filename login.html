@@ -15,6 +15,7 @@
   <script src="./src/js/config-loader.js"></script>
   <!-- Firebase Compat SDK -->
   <script src="https://www.gstatic.com/firebasejs/11.0.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/11.0.0/firebase-app-check-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/11.0.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore-compat.js"></script>
   <!-- Firebase initialization -->
@@ -119,14 +120,20 @@
   </main>
 
   <script>
+    if (!window.__fbAuth) {
+      console.error('Firebase auth unavailable on login page.');
+    }
+
     // Redirect already-logged-in users
-    window.__fbAuth.onAuthStateChanged(function(user) {
-      if (user) {
-        var redirectTo = localStorage.getItem('grovity_redirect_after_login');
-        localStorage.removeItem('grovity_redirect_after_login');
-        window.location.href = redirectTo || 'workspace.html';
-      }
-    });
+    if (window.__fbAuth && typeof window.__fbAuth.onAuthStateChanged === 'function') {
+      window.__fbAuth.onAuthStateChanged(function(user) {
+        if (user) {
+          var redirectTo = localStorage.getItem('grovity_redirect_after_login');
+          localStorage.removeItem('grovity_redirect_after_login');
+          window.location.href = redirectTo || 'workspace.html';
+        }
+      });
+    }
 
     function _postLoginRedirect(user) {
       localStorage.setItem('grovity_user', JSON.stringify({
@@ -158,6 +165,7 @@
       var email    = document.getElementById('email').value.trim();
       var password = document.getElementById('password').value;
       if (!email || !password) return;
+      if (!window.__fbAuth) { _showError('Authentication is not available right now.'); return; }
 
       window.__fbAuth.signInWithEmailAndPassword(email, password)
         .then(function(result) { _postLoginRedirect(result.user); })
@@ -175,6 +183,7 @@
     // Google sign-in
     document.getElementById('googleLoginBtn').addEventListener('click', function() {
       document.getElementById('authError').classList.add('hidden');
+      if (!window.__fbAuth || !window.__fbProvider) { _showError('Google sign-in is not available right now.'); return; }
       window.__fbAuth.signInWithPopup(window.__fbProvider)
         .then(function(result) { _postLoginRedirect(result.user); })
         .catch(function(err) { _showError(err.message); });

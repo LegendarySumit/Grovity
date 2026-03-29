@@ -18,6 +18,12 @@ function escapeHTML(str) {
 // ============================================================
 async function initializeUserData() {
   return new Promise((resolve) => {
+    if (!window.__fbAuth || typeof window.__fbAuth.onAuthStateChanged !== 'function') {
+      console.error('Workspace auth unavailable. Firebase bootstrap may have failed.');
+      resolve();
+      return;
+    }
+
     window.__fbAuth.onAuthStateChanged(async (user) => {
       if (user) {
         currentUserId = user.uid;
@@ -39,6 +45,8 @@ async function initializeUserData() {
         
         resolve();
       } else {
+        localStorage.setItem('grovity_redirect_after_login', 'workspace.html');
+        window.location.href = 'login.html';
         resolve();
       }
     });
