@@ -20,6 +20,12 @@ const appCheckSiteKey = (window.__FB_APPCHECK_SITE_KEY__ || '').trim();
 const host = (window.location && window.location.hostname) || '';
 const isLocalHost = host === 'localhost' || host === '127.0.0.1' || host === '[::1]';
 
+window.__fbAppCheckState = {
+  activated: false,
+  attempted: false,
+  reason: 'not-started'
+};
+
 function showBootstrapError(message) {
   window.__grovityBootError = message;
   console.error('Grovity bootstrap error:', message);
@@ -80,12 +86,16 @@ if (missingFields.length > 0) {
   };
 
   function activateAppCheckSafely() {
+    window.__fbAppCheckState.attempted = true;
+
     if (!appCheckSiteKey && !isLocalHost) {
+      window.__fbAppCheckState.reason = 'missing-site-key';
       showBootstrapError('Missing Firebase App Check site key on non-localhost host.');
       return;
     }
 
     if (!(firebase.appCheck && typeof firebase.appCheck === 'function')) {
+      window.__fbAppCheckState.reason = 'sdk-missing';
       if (!isLocalHost) {
         showBootstrapError('Firebase App Check SDK missing or not initialized on non-localhost host.');
       } else {
@@ -95,6 +105,7 @@ if (missingFields.length > 0) {
     }
 
     if (!appCheckSiteKey) {
+      window.__fbAppCheckState.reason = 'localhost-no-site-key';
       console.warn('App Check site key is empty. Local development fallback is enabled.');
       return;
     }
@@ -108,8 +119,11 @@ if (missingFields.length > 0) {
       const _fbAppCheck = firebase.appCheck();
       _fbAppCheck.activate(appCheckSiteKey, true);
       window.__fbAppCheck = _fbAppCheck;
+      window.__fbAppCheckState.activated = true;
+      window.__fbAppCheckState.reason = 'activated';
     } catch (error) {
       console.error('Grovity App Check activation failed:', error);
+      window.__fbAppCheckState.reason = 'activation-failed';
       if (!isLocalHost) {
         showBootstrapError('Failed to initialize App Check on production host.');
       }

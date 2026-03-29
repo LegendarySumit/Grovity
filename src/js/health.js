@@ -102,6 +102,42 @@
     });
   }
 
+  function waitForAppCheck(maxWaitMs) {
+    return new Promise(function (resolve) {
+      var timeoutMs = typeof maxWaitMs === 'number' ? maxWaitMs : 2500;
+      var start = Date.now();
+
+      function evaluate() {
+        if (window.__fbAppCheck) {
+          resolve({ state: 'pass', detail: 'App Check is active in this session.' });
+          return;
+        }
+
+        var state = window.__fbAppCheckState || {};
+        if (state.attempted && state.reason && state.reason !== 'not-started' && Date.now() - start > 500) {
+          if (state.reason === 'localhost-no-site-key') {
+            resolve({ state: 'warn', detail: 'App Check skipped on localhost because site key is not configured.' });
+            return;
+          }
+
+          if (state.reason === 'activation-failed') {
+            resolve({ state: 'warn', detail: 'App Check activation was attempted but did not complete.' });
+            return;
+          }
+        }
+
+        if (Date.now() - start >= timeoutMs) {
+          resolve({ state: 'warn', detail: 'App Check object not detected yet. Re-run once page is fully settled.' });
+          return;
+        }
+
+        setTimeout(evaluate, 150);
+      }
+
+      evaluate();
+    });
+  }
+
   async function runChecks() {
     resultsRoot.innerHTML = '';
 
@@ -128,11 +164,8 @@
       addResult('Firebase SDK', 'fail', 'Firebase SDK not loaded.');
     }
 
-    if (window.__fbAppCheck) {
-      addResult('App Check', 'pass', 'App Check is active in this session.');
-    } else {
-      addResult('App Check', 'warn', 'App Check object not detected. Check environment and token state.');
-    }
+    var appCheckStatus = await waitForAppCheck(3000);
+    addResult('App Check', appCheckStatus.state, appCheckStatus.detail);
 
     var authStatus = await checkAuth();
     addResult('Authentication', authStatus.state, authStatus.detail);
