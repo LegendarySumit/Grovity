@@ -18,6 +18,8 @@
   <script src="https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore-compat.js"></script>
   <!-- Firebase initialization -->
   <script src="./src/js/firebase-init-secure.js"></script>
+  <!-- Shared auth guard -->
+  <script src="./src/js/auth-guard.js"></script>
   <!-- Firestore Database Service -->
   <script src="./src/js/firestore-db.js"></script>
   <style>
@@ -360,26 +362,6 @@
       </div>
     </div>
   </footer>
-
-  <!-- Auth Guard -->
-  <script>
-    window.__fbAuth.onAuthStateChanged(function(user) {
-      if (!user) {
-        localStorage.setItem('grovity_redirect_after_login', 'workspace.html');
-        window.location.href = 'login.html';
-      } else {
-        var stored = JSON.parse(localStorage.getItem('grovity_user') || '{}');
-        if (!stored.uid) {
-          localStorage.setItem('grovity_user', JSON.stringify({
-            name: user.displayName || user.email.split('@')[0],
-            email: user.email,
-            photo: user.photoURL || '',
-            uid: user.uid
-          }));
-        }
-      }
-    });
-  </script>
 
   <!-- SCRIPTS -->
   <script src="./src/js/sync.js"></script>

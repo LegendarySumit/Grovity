@@ -33,6 +33,10 @@ logs/
 *.log
 npm-debug.log*
 
+# Playwright artifacts
+test-results/
+playwright-report/
+
 # Dependencies
 .yarn/
 .pnp

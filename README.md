@@ -207,6 +207,34 @@ http://localhost:5000
 
 ---
 
+## 🩺 Startup Health Check
+
+Use the startup health page to verify Firebase runtime readiness before public releases:
+
+- Open `health.html`
+- Validate config presence, Firebase bootstrap, auth readiness, and Firestore reachability
+- Re-run checks after changing env/config or App Check settings
+
+---
+
+## ✅ CI Checks
+
+Minimal CI checks now cover HTML, JavaScript syntax, and top-level navigation smoke tests.
+
+```bash
+npm run check:html
+npm run check:js
+npm run test:smoke
+```
+
+Run all checks locally:
+
+```bash
+npm run ci
+```
+
+---
+
 ## 🔥 Firebase Setup
 
 ### 1. Create Firebase Project

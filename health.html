@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Grovity - Startup Health</title>
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+  <link rel="stylesheet" href="./dist/output.css" />
+  <link rel="stylesheet" href="./theme-system.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <script src="./src/js/config-loader.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/11.0.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/11.0.0/firebase-app-check-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/11.0.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore-compat.js"></script>
+  <script src="./src/js/firebase-init-secure.js"></script>
+  <script src="./src/js/auth-guard.js"></script>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen">
+  <main class="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12 space-y-6">
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <div>
+        <p class="text-xs uppercase tracking-[0.2em] text-blue-400 font-semibold">Operations</p>
+        <h1 class="text-2xl sm:text-3xl font-bold tracking-tight">Startup Health Check</h1>
+      </div>
+      <div class="flex items-center gap-2">
+        <a href="index.html" class="px-3 py-2 text-xs border border-slate-700 rounded-lg hover:border-blue-400 transition">Back to home</a>
+        <button id="rerunHealthCheck" class="px-3 py-2 text-xs bg-blue-500 rounded-lg hover:bg-blue-600 transition">Run again</button>
+      </div>
+    </div>
+
+    <div class="rounded-xl border border-slate-800 bg-slate-900/70 p-4">
+      <p id="healthSummary" class="text-sm text-slate-300">Running checks...</p>
+      <p class="text-xs text-slate-500 mt-2">This page validates runtime config, Firebase bootstrap, auth readiness, and Firestore reachability.</p>
+    </div>
+
+    <div id="healthResults" class="grid gap-3"></div>
+  </main>
+
+  <button onclick="toggleTheme()" class="theme-toggle" aria-label="Toggle theme">
+    <i id="themeIcon" class="fa-solid fa-sun"></i>
+  </button>
+
+  <script src="./src/js/health.js"></script>
+  <script src="./theme-system.js"></script>
+</body>
+</html>

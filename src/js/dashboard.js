@@ -8,25 +8,21 @@ function escapeHTML(str) {
 let currentUserId = null;
 
 async function initializeUserContext() {
-  return new Promise((resolve) => {
-    if (!window.__fbAuth || typeof window.__fbAuth.onAuthStateChanged !== 'function') {
-      console.error('Dashboard auth unavailable. Firebase bootstrap may have failed.');
-      resolve();
-      return;
-    }
+  if (!window.grovityAuthGuard || typeof window.grovityAuthGuard.requireAuth !== 'function') {
+    console.error('Auth guard unavailable on dashboard page.');
+    return;
+  }
 
-    window.__fbAuth.onAuthStateChanged((user) => {
-      if (user) {
-        currentUserId = user.uid;
-        console.log('✅ Dashboard: User authenticated:', currentUserId);
-      } else {
-        console.warn('⚠️ Dashboard: No user authenticated');
-        localStorage.setItem('grovity_redirect_after_login', 'dashboard.html');
-        window.location.href = 'login.html';
-      }
-      resolve();
-    });
+  const user = await window.grovityAuthGuard.requireAuth({
+    redirectAfterLogin: 'dashboard.html'
   });
+
+  if (!user) {
+    return;
+  }
+
+  currentUserId = user.uid;
+  console.log('Dashboard: User authenticated:', currentUserId);
 }
 
 // Initialize user context when page loads
@@ -634,16 +630,11 @@ startDashboardBackgroundTimer();
 // Handle logout
 function handleLogout() {
   if (confirm('Are you sure you want to logout?')) {
-    var theme = localStorage.getItem('grovity_theme');
-    var doLogout = function() {
-      localStorage.clear();
-      if (theme) localStorage.setItem('grovity_theme', theme);
-      window.location.href = 'index.html';
-    };
-    if (window.__fbSignOut) {
-      window.__fbSignOut().then(doLogout).catch(doLogout);
-    } else {
-      doLogout();
+    if (window.grovityAuthGuard && typeof window.grovityAuthGuard.logout === 'function') {
+      window.grovityAuthGuard.logout({ destination: 'index.html' });
+      return;
     }
+
+    window.location.href = 'index.html';
   }
 }

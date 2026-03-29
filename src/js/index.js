@@ -5,6 +5,9 @@ if (window.__fbAuth && typeof window.__fbAuth.onAuthStateChanged === 'function')
   window.__fbAuth.onAuthStateChanged((user) => {
     authResolved = true;
     firebaseAuthUser = user || null;
+    if (user && window.grovityAuthGuard && typeof window.grovityAuthGuard.saveUser === 'function') {
+      window.grovityAuthGuard.saveUser(user);
+    }
     updateNavButtons();
   });
 }
@@ -24,7 +27,9 @@ function isUserLoggedIn() {
     return false;
   }
 
-  const user = JSON.parse(localStorage.getItem('grovity_user') || '{}');
+  const user = window.grovityAuthGuard && typeof window.grovityAuthGuard.isLoggedInSync === 'function'
+    ? (window.grovityAuthGuard.isLoggedInSync() ? { email: 'fallback-user' } : {})
+    : JSON.parse(localStorage.getItem('grovity_user') || '{}');
   // Fallback for the initial auth hydration phase
   return user.email && user.email.length > 0;
 }
@@ -32,17 +37,12 @@ function isUserLoggedIn() {
 // Handle logout
 function handleLogout() {
   if (confirm('Are you sure you want to logout?')) {
-    var theme = localStorage.getItem('grovity_theme');
-    var doLogout = function() {
-      localStorage.clear();
-      if (theme) localStorage.setItem('grovity_theme', theme);
-      window.location.href = 'index.html';
-    };
-    if (window.__fbSignOut) {
-      window.__fbSignOut().then(doLogout).catch(doLogout);
-    } else {
-      doLogout();
+    if (window.grovityAuthGuard && typeof window.grovityAuthGuard.logout === 'function') {
+      window.grovityAuthGuard.logout({ destination: 'index.html' });
+      return;
     }
+
+    window.location.href = 'index.html';
   }
 }
 
@@ -91,7 +91,11 @@ function updateNavButtons() {
 function requireLogin(destination) {
   if (!isUserLoggedIn()) {
     // Not logged in - redirect to login page
-    localStorage.setItem('grovity_redirect_after_login', destination);
+    if (window.grovityAuthGuard && typeof window.grovityAuthGuard.setRedirectAfterLogin === 'function') {
+      window.grovityAuthGuard.setRedirectAfterLogin(destination);
+    } else {
+      localStorage.setItem('grovity_redirect_after_login', destination);
+    }
     window.location.href = 'login.html';
     return false;
   }
@@ -114,7 +118,11 @@ function requireLogin(destination) {
 function redirectToWorkspace() {
   if (!isUserLoggedIn()) {
     // Not logged in - redirect to login
-    localStorage.setItem('grovity_redirect_after_login', 'workspace.html');
+    if (window.grovityAuthGuard && typeof window.grovityAuthGuard.setRedirectAfterLogin === 'function') {
+      window.grovityAuthGuard.setRedirectAfterLogin('workspace.html');
+    } else {
+      localStorage.setItem('grovity_redirect_after_login', 'workspace.html');
+    }
     window.location.href = 'login.html';
   } else {
     // Logged in - go to workspace
@@ -296,7 +304,11 @@ function selectPlan(planName) {
   if (!isUserLoggedIn()) {
     // Not logged in - redirect to signup/login
     localStorage.setItem('grovity_selected_plan', planName);
-    localStorage.setItem('grovity_redirect_after_login', 'workspace.html');
+    if (window.grovityAuthGuard && typeof window.grovityAuthGuard.setRedirectAfterLogin === 'function') {
+      window.grovityAuthGuard.setRedirectAfterLogin('workspace.html');
+    } else {
+      localStorage.setItem('grovity_redirect_after_login', 'workspace.html');
+    }
     window.location.href = 'signup.html';
     return;
   }
@@ -319,7 +331,11 @@ function selectPlan(planName) {
 function checkPlanAccess(destination) {
   // First check if user is logged in
   if (!isUserLoggedIn()) {
-    localStorage.setItem('grovity_redirect_after_login', destination);
+    if (window.grovityAuthGuard && typeof window.grovityAuthGuard.setRedirectAfterLogin === 'function') {
+      window.grovityAuthGuard.setRedirectAfterLogin(destination);
+    } else {
+      localStorage.setItem('grovity_redirect_after_login', destination);
+    }
     window.location.href = 'login.html';
     return;
   }

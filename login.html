@@ -20,6 +20,8 @@
   <script src="https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore-compat.js"></script>
   <!-- Firebase initialization -->
   <script src="./src/js/firebase-init-secure.js"></script>
+  <!-- Shared auth guard -->
+  <script src="./src/js/auth-guard.js"></script>
   <!-- Firestore Database Service -->
   <script src="./src/js/firestore-db.js"></script>
 </head>
@@ -125,23 +127,14 @@
     }
 
     // Redirect already-logged-in users
-    if (window.__fbAuth && typeof window.__fbAuth.onAuthStateChanged === 'function') {
-      window.__fbAuth.onAuthStateChanged(function(user) {
-        if (user) {
-          var redirectTo = localStorage.getItem('grovity_redirect_after_login');
-          localStorage.removeItem('grovity_redirect_after_login');
-          window.location.href = redirectTo || 'workspace.html';
-        }
-      });
+    if (window.grovityAuthGuard && typeof window.grovityAuthGuard.redirectIfAuthenticated === 'function') {
+      window.grovityAuthGuard.redirectIfAuthenticated('workspace.html');
     }
 
     function _postLoginRedirect(user) {
-      localStorage.setItem('grovity_user', JSON.stringify({
-        name: user.displayName || user.email.split('@')[0],
-        email: user.email,
-        photo: user.photoURL || '',
-        uid: user.uid
-      }));
+      if (window.grovityAuthGuard && typeof window.grovityAuthGuard.saveUser === 'function') {
+        window.grovityAuthGuard.saveUser(user);
+      }
       var selectedPlan = localStorage.getItem('grovity_selected_plan');
       if (selectedPlan) {
         localStorage.setItem('grovity_plan', selectedPlan);

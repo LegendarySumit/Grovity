@@ -17,39 +17,34 @@ function escapeHTML(str) {
 // FIRESTORE INITIALIZATION - Wait for user authentication
 // ============================================================
 async function initializeUserData() {
-  return new Promise((resolve) => {
-    if (!window.__fbAuth || typeof window.__fbAuth.onAuthStateChanged !== 'function') {
-      console.error('Workspace auth unavailable. Firebase bootstrap may have failed.');
-      resolve();
-      return;
-    }
+  if (!window.grovityAuthGuard || typeof window.grovityAuthGuard.requireAuth !== 'function') {
+    console.error('Auth guard unavailable on workspace page.');
+    return;
+  }
 
-    window.__fbAuth.onAuthStateChanged(async (user) => {
-      if (user) {
-        currentUserId = user.uid;
-        
-        // Load data from Firestore
-        await loadTasksFromFirestore();
-        await loadHabitsFromFirestore();
-        
-        // Setup real-time listeners
-        window.__grovityDB.onTasksChange(currentUserId, (updatedTasks) => {
-          tasks = updatedTasks;
-          renderTasks();
-        });
-        
-        window.__grovityDB.onHabitsChange(currentUserId, (updatedHabits) => {
-          habits = updatedHabits;
-          renderHabits();
-        });
-        
-        resolve();
-      } else {
-        localStorage.setItem('grovity_redirect_after_login', 'workspace.html');
-        window.location.href = 'login.html';
-        resolve();
-      }
-    });
+  const user = await window.grovityAuthGuard.requireAuth({
+    redirectAfterLogin: 'workspace.html'
+  });
+
+  if (!user) {
+    return;
+  }
+
+  currentUserId = user.uid;
+
+  // Load data from Firestore
+  await loadTasksFromFirestore();
+  await loadHabitsFromFirestore();
+
+  // Setup real-time listeners
+  window.__grovityDB.onTasksChange(currentUserId, (updatedTasks) => {
+    tasks = updatedTasks;
+    renderTasks();
+  });
+
+  window.__grovityDB.onHabitsChange(currentUserId, (updatedHabits) => {
+    habits = updatedHabits;
+    renderHabits();
   });
 }
 
@@ -667,17 +662,12 @@ setInterval(() => {
 // Handle logout
 function handleLogout() {
   if (confirm('Are you sure you want to logout?')) {
-    var theme = localStorage.getItem('grovity_theme');
-    var doLogout = function() {
-      localStorage.clear();
-      if (theme) localStorage.setItem('grovity_theme', theme);
-      window.location.href = 'index.html';
-    };
-    if (window.__fbSignOut) {
-      window.__fbSignOut().then(doLogout).catch(doLogout);
-    } else {
-      doLogout();
+    if (window.grovityAuthGuard && typeof window.grovityAuthGuard.logout === 'function') {
+      window.grovityAuthGuard.logout({ destination: 'index.html' });
+      return;
     }
+
+    window.location.href = 'index.html';
   }
 }
 

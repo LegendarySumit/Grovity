@@ -3,10 +3,16 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    
+    "check:html": "htmlhint \"*.html\"",
+    "check:js": "node ./scripts/check-js.cjs",
+    "test:smoke": "playwright test",
+    "ci": "npm run check:html && npm run check:js && npm run test:smoke"
   },
   "devDependencies": {
+    "@playwright/test": "^1.57.0",
     "tailwindcss": "^4.1.17",
-    "@tailwindcss/cli": "^4.1.17"
+    "@tailwindcss/cli": "^4.1.17",
+    "htmlhint": "^1.7.1",
+    "http-server": "^14.1.1"
   }
 }
