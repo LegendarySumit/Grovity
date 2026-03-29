@@ -1,6 +1,19 @@
 {
   "name": "grovity",
   "version": "1.0.0",
+  "license": "MIT",
+  "keywords": [
+    "productivity",
+    "pomodoro",
+    "task-manager",
+    "habit-tracker",
+    "firebase",
+    "firestore",
+    "app-check",
+    "vanilla-javascript",
+    "pwa-ready",
+    "focus"
+  ],
   "private": true,
   "scripts": {
     "check:html": "htmlhint \"*.html\"",

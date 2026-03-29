@@ -9,10 +9,13 @@
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?logo=javascript&logoColor=black)
 ![Firebase](https://img.shields.io/badge/Firebase-FFCA28?logo=firebase&logoColor=black)
 ![Firestore](https://img.shields.io/badge/Firestore-4285F4?logo=google-cloud&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-green.svg)
 
 *Track tasks • Build habits • Manage time • Visualize growth*
 
 **Now with Firebase Cloud Sync & Google OAuth**
+
+**Implementation status:** P0 + P1 + P2 completed
 
 [Features](#-features) • [Quick Start](#-quick-start) • [Firebase Setup](#-firebase-setup) • [Tech Stack](#-tech-stack)
 
@@ -25,6 +28,31 @@
 **Grovity** is a comprehensive productivity platform designed to help users **stay focused**, **track daily tasks**, **build positive habits**, and **monitor growth** through visual analytics.
 
 Features a clean, responsive interface with **light/dark mode support**, **real-time synchronization** across all pages, and **cloud-based data persistence** powered by **Firebase Firestore**.
+
+---
+
+## 🏷️ Tags
+
+`productivity`, `pomodoro`, `task-manager`, `habit-tracker`, `firebase`, `firestore`, `app-check`, `vanilla-javascript`, `focus`, `web-app`
+
+---
+
+## ✅ Implementation Progress
+
+### P0 (Launch Security) - Completed
+- Strict Firebase security posture (deny-by-default, user-scoped docs)
+- Authorized domains and API key restriction workflow
+- Firebase App Check integration and enforcement readiness
+
+### P1 (Core Reliability) - Completed
+- Centralized auth guard utility (`auth-guard.js`)
+- Startup health check page (`health.html` + `health.js`)
+- CI baseline with HTML/JS checks and Playwright smoke tests
+
+### P2 (Stability / Polish) - Completed
+- Rate-limited Firestore write paths for sensitive mutations
+- Reduced localStorage dependence for identity/session-derived UI state
+- Incident logging hooks for auth/bootstrap/firestore failures with buffered fallback
 
 ---
 
