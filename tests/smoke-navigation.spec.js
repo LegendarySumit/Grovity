@@ -18,11 +18,24 @@ test.describe('public navigation smoke', () => {
   test('home nav reaches auth pages', async ({ page }) => {
     await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
 
-    await page.getByRole('link', { name: 'Login' }).first().click();
+    const desktopLogin = page.locator('#navLoginBtn');
+    if (await desktopLogin.isVisible()) {
+      await desktopLogin.click();
+    } else {
+      await page.locator('#menuBtn').click();
+      await page.locator('#sidebarLoginBtn').click();
+    }
     await expect(page).toHaveURL(/login\.html$/);
 
     await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
-    await page.getByRole('button', { name: 'Sign Up' }).first().click();
+
+    const desktopSignup = page.locator('#navSignupBtn');
+    if (await desktopSignup.isVisible()) {
+      await desktopSignup.click();
+    } else {
+      await page.locator('#menuBtn').click();
+      await page.locator('#sidebarSignupBtn').click();
+    }
     await expect(page).toHaveURL(/signup\.html$/);
   });
 });
