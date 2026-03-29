@@ -18,6 +18,8 @@
   <script src="https://www.gstatic.com/firebasejs/11.0.0/firebase-app-check-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/11.0.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore-compat.js"></script>
+  <!-- Incident logger -->
+  <script src="./src/js/incident-logger.js"></script>
   <!-- Firebase initialization -->
   <script src="./src/js/firebase-init-secure.js"></script>
   <!-- Shared auth guard -->
@@ -148,8 +150,12 @@
         localStorage.setItem('grovity_plan', selectedPlan);
         localStorage.removeItem('grovity_selected_plan');
       }
-      var redirectTo = localStorage.getItem('grovity_redirect_after_login');
-      localStorage.removeItem('grovity_redirect_after_login');
+      var redirectTo = window.grovityAuthGuard && typeof window.grovityAuthGuard.getRedirectAfterLogin === 'function'
+        ? window.grovityAuthGuard.getRedirectAfterLogin()
+        : null;
+      if (window.grovityAuthGuard && typeof window.grovityAuthGuard.clearRedirectAfterLogin === 'function') {
+        window.grovityAuthGuard.clearRedirectAfterLogin();
+      }
       window.location.href = redirectTo || 'workspace.html';
     }
 
@@ -182,6 +188,13 @@
         })
         .then(function(user) { _postSignupRedirect(user); })
         .catch(function(err) {
+          if (window.grovityIncidentLogger && typeof window.grovityIncidentLogger.logIncident === 'function') {
+            window.grovityIncidentLogger.logIncident('auth', 'signup-failed', {
+              level: 'warn',
+              error: err,
+              context: { provider: 'password' }
+            });
+          }
           var msg = 'Sign-up failed. Please try again.';
           if (err.code === 'auth/email-already-in-use') msg = 'An account with this email already exists.';
           else if (err.code === 'auth/invalid-email')  msg = 'Please enter a valid email address.';
@@ -196,7 +209,16 @@
       if (!window.__fbAuth || !window.__fbProvider) { _showError('Google sign-in is not available right now.'); return; }
       window.__fbAuth.signInWithPopup(window.__fbProvider)
         .then(function(result) { _postSignupRedirect(result.user); })
-        .catch(function(err) { _showError(err.message); });
+        .catch(function(err) {
+          if (window.grovityIncidentLogger && typeof window.grovityIncidentLogger.logIncident === 'function') {
+            window.grovityIncidentLogger.logIncident('auth', 'google-signup-failed', {
+              level: 'warn',
+              error: err,
+              context: { provider: 'google' }
+            });
+          }
+          _showError(err.message);
+        });
     });
   </script>
 

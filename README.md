@@ -235,6 +235,16 @@ npm run ci
 
 ---
 
+## 🛡️ P2 Stability Upgrades
+
+Recent P2 hardening includes:
+
+- Write-rate limits in `firestore-db.js` for task, habit, progress, and notes mutation paths
+- Reduced identity/session reliance on localStorage by moving auth redirect and user cache flows into session-oriented guard logic
+- Incident logging hooks for auth/bootstrap/firestore failures with buffered fallback and optional remote flush when auth + Firestore are available
+
+---
+
 ## 🔥 Firebase Setup
 
 ### 1. Create Firebase Project

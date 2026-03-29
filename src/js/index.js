@@ -29,7 +29,7 @@ function isUserLoggedIn() {
 
   const user = window.grovityAuthGuard && typeof window.grovityAuthGuard.isLoggedInSync === 'function'
     ? (window.grovityAuthGuard.isLoggedInSync() ? { email: 'fallback-user' } : {})
-    : JSON.parse(localStorage.getItem('grovity_user') || '{}');
+    : {};
   // Fallback for the initial auth hydration phase
   return user.email && user.email.length > 0;
 }
@@ -93,8 +93,6 @@ function requireLogin(destination) {
     // Not logged in - redirect to login page
     if (window.grovityAuthGuard && typeof window.grovityAuthGuard.setRedirectAfterLogin === 'function') {
       window.grovityAuthGuard.setRedirectAfterLogin(destination);
-    } else {
-      localStorage.setItem('grovity_redirect_after_login', destination);
     }
     window.location.href = 'login.html';
     return false;
@@ -120,8 +118,6 @@ function redirectToWorkspace() {
     // Not logged in - redirect to login
     if (window.grovityAuthGuard && typeof window.grovityAuthGuard.setRedirectAfterLogin === 'function') {
       window.grovityAuthGuard.setRedirectAfterLogin('workspace.html');
-    } else {
-      localStorage.setItem('grovity_redirect_after_login', 'workspace.html');
     }
     window.location.href = 'login.html';
   } else {
@@ -306,8 +302,6 @@ function selectPlan(planName) {
     localStorage.setItem('grovity_selected_plan', planName);
     if (window.grovityAuthGuard && typeof window.grovityAuthGuard.setRedirectAfterLogin === 'function') {
       window.grovityAuthGuard.setRedirectAfterLogin('workspace.html');
-    } else {
-      localStorage.setItem('grovity_redirect_after_login', 'workspace.html');
     }
     window.location.href = 'signup.html';
     return;
@@ -333,8 +327,6 @@ function checkPlanAccess(destination) {
   if (!isUserLoggedIn()) {
     if (window.grovityAuthGuard && typeof window.grovityAuthGuard.setRedirectAfterLogin === 'function') {
       window.grovityAuthGuard.setRedirectAfterLogin(destination);
-    } else {
-      localStorage.setItem('grovity_redirect_after_login', destination);
     }
     window.location.href = 'login.html';
     return;

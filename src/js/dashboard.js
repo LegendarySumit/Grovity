@@ -70,7 +70,9 @@ function loadDashboard() {
   const tasks = JSON.parse(localStorage.getItem('grovity_tasks') || '[]');
   
   // Load user profile data
-  const userData = JSON.parse(localStorage.getItem('grovity_user') || '{}');
+  const userData = window.grovityAuthGuard && typeof window.grovityAuthGuard.getCachedUser === 'function'
+    ? window.grovityAuthGuard.getCachedUser()
+    : {};
   const userPlan = localStorage.getItem('grovity_plan') || 'Starter';
   
   if (userData.name) {
@@ -521,6 +523,13 @@ if (notesArea && charCount && saveNotesBtn && clearNotesBtn) {
       console.log('✅ Notes loaded from Firestore');
     } catch (error) {
       console.error('❌ Error loading notes:', error);
+      if (window.grovityIncidentLogger && typeof window.grovityIncidentLogger.logIncident === 'function') {
+        window.grovityIncidentLogger.logIncident('firestore', 'notes-load-failed', {
+          level: 'warn',
+          error: error,
+          context: { noteId: 'user-notes', source: 'dashboard' }
+        });
+      }
       // Fallback to localStorage if Firestore fails
       const fallbackNotes = localStorage.getItem(NOTES_KEY) || '';
       notesArea.value = fallbackNotes;
@@ -547,6 +556,13 @@ if (notesArea && charCount && saveNotesBtn && clearNotesBtn) {
       console.log('✅ Notes saved to Firestore');
     } catch (error) {
       console.error('❌ Error saving notes:', error);
+      if (window.grovityIncidentLogger && typeof window.grovityIncidentLogger.logIncident === 'function') {
+        window.grovityIncidentLogger.logIncident('firestore', 'notes-save-failed', {
+          level: 'warn',
+          error: error,
+          context: { noteId: 'user-notes', source: 'dashboard' }
+        });
+      }
       localStorage.setItem(NOTES_KEY, notesArea.value); // Fallback save
     }
   }

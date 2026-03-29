@@ -29,6 +29,13 @@ window.__fbAppCheckState = {
 function showBootstrapError(message) {
   window.__grovityBootError = message;
   console.error('Grovity bootstrap error:', message);
+  if (window.grovityIncidentLogger && typeof window.grovityIncidentLogger.logIncident === 'function') {
+    window.grovityIncidentLogger.logIncident('auth', 'bootstrap-error', {
+      level: 'error',
+      message: message,
+      context: { host: host }
+    });
+  }
 
   const renderError = function () {
     if (!document.body) {
@@ -123,6 +130,13 @@ if (missingFields.length > 0) {
       window.__fbAppCheckState.reason = 'activated';
     } catch (error) {
       console.error('Grovity App Check activation failed:', error);
+      if (window.grovityIncidentLogger && typeof window.grovityIncidentLogger.logIncident === 'function') {
+        window.grovityIncidentLogger.logIncident('auth', 'app-check-activation-failed', {
+          level: 'warn',
+          error: error,
+          context: { host: host }
+        });
+      }
       window.__fbAppCheckState.reason = 'activation-failed';
       if (!isLocalHost) {
         showBootstrapError('Failed to initialize App Check on production host.');
